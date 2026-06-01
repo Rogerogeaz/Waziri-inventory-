@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c9832d">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Waziri Production System</title>
@@ -96,9 +98,7 @@ Save Baker
 </div>
 <div class="card">
 
-<h3>Today's Production</h3>
 
-<div id="adminDailyReport"></div>
 
 </div>
 <div class="card">
@@ -506,7 +506,8 @@ document.getElementById("welcomeBaker")
 
 loadMyProduction();
 loadWastage();
-
+loadReturns();
+loadDailyReport();
 return;
 
 }
@@ -811,7 +812,6 @@ window.saveInventory = async function(){
 
 const ingredient =
 document.getElementById("ingredientName").value;
-
 const qty =
 Number(document.getElementById("ingredientQty").value);
 
@@ -1101,6 +1101,46 @@ ${h.ingredient}
 div.innerHTML = html;
 
 }
+window.resetProduction = async function(){
+
+if(!confirm("Delete ALL production records?")) return;
+
+const snap =
+await getDocs(collection(db,"production"));
+
+for(const docSnap of snap.docs){
+
+await deleteDoc(
+doc(db,"production",docSnap.id)
+);
+
+}
+
+alert("Production Reset");
+
+loadDailyReport();
+
+}
+window.resetWastage = async function(){
+
+if(!confirm("Delete ALL wastage records?")) return;
+
+const snap =
+await getDocs(collection(db,"wastage"));
+
+for(const docSnap of snap.docs){
+
+await deleteDoc(
+doc(db,"wastage",docSnap.id)
+);
+
+}
+
+alert("Wastage Reset");
+
+loadWastage();
+
+}
 window.loadDailyReport = async function(){
 
 const bakerDiv =
@@ -1282,8 +1322,8 @@ loadPackaging();
 }
 window.saveWaste = async function(){
 
-const ingredient =
-document.getElementById("wasteIngredient").value;
+const product =
+document.getElementById("wasteProduct").value;
 
 const qty =
 Number(document.getElementById("wasteQty").value);
@@ -1342,47 +1382,12 @@ return;
 
 }
 
-const inventoryQuery = query(
-collection(db,"inventory"),
-where("ingredient","==",ingredient)
-);
 
-const inventorySnap =
-await getDocs(inventoryQuery);
-
-if(inventorySnap.empty){
-
-alert("Ingredient not found");
-
-return;
-
-}
-
-const stockDoc =
-inventorySnap.docs[0];
-
-const stock =
-stockDoc.data();
-
-if(stock.qty < qty){
-
-alert("Not enough stock");
-
-return;
-
-}
-
-await updateDoc(
-doc(db,"inventory",stockDoc.id),
-{
-qty: stock.qty - qty
-}
-);
 
 await addDoc(
 collection(db,"wastage"),
 {
-ingredient,
+product,
 qty,
 reason,
 created: serverTimestamp()
@@ -1457,7 +1462,7 @@ html += `
 padding:8px;
 border-bottom:1px solid #ddd;
 ">
-<b>${w.ingredient}</b>
+<b>${w.product}</b>
 - ${w.qty}
 <br>
 Reason:

@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Waziri Production System</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:url('https://i.ibb.co/ymp7kZ0n/images-15.jpg');
+background-size:cover;
+background-position:center;
+}
+
+.overlay{
+background:rgba(255,255,255,.93);
+min-height:100vh;
+padding:15px;
+}
+
+.card{
+background:white;
+padding:15px;
+margin-bottom:12px;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+
+input,select,button{
+width:100%;
+padding:10px;
+margin-top:8px;
+box-sizing:border-box;
+}
+
+button{
+background:#C57C2D;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+.hidden{
+display:none;
+}
+
+.userCard{
+border-bottom:1px solid #ddd;
+padding:10px 0;
+}
+
+</style>
+</head>
+<body>
+
+<div class="overlay">
+
+<h2>Waziri Production & Inventory</h2>
+
+<div id="loginCard" class="card">
+
+<select id="role">
+
+<option value="admin">Admin</option>
+
+<option value="baker">Baker</option>
+
+</select>
+
+<input id="loginCode" placeholder="Enter Code">
+
+<button onclick="login()">
+Login
+</button>
+
+</div>
+
+<div id="adminPanel" class="hidden">
+
+<div class="card">
+
+<h3>Create Baker</h3>
+
+<input id="bakerName" placeholder="Baker Name">
+
+<input id="bakerCode" placeholder="Baker Login Code">
+
+<button onclick="saveBaker()">
+Save Baker
+</button>
+
+</div>
+<div class="card">
+
+<h3>Today's Production</h3>
+
+<div id="adminDailyReport"></div>
+
+</div>
+<div class="card">
+
+<h3>Registered Bakers</h3>
+<div class="card">
+
+<h3>Inventory</h3>
+
+<input
+id="ingredientName"
+placeholder="Ingredient Name">
+
+<input
+id="ingredientQty"
+type="number"
+placeholder="Quantity">
+
+<input
+id="ingredientCost"
+type="number"
+placeholder="Cost Per Unit">
+
+<button onclick="saveInventory()">
+Save Inventory
+</button>
+
+</div>
+
+<div class="card">
+<div class="card">
+
+<h3>Current Stock Summary</h3>
+
+<div id="stockSummary"></div>
+
+</div>
+<h3>Inventory List</h3>
+
+<div id="inventoryList"></div>
+
+</div>
+<div class="card">
+
+<h3>Inventory History</h3>
+
+<div id="inventoryHistory"></div>
+
+</div>
+<div class="card">
+
+<h3>Today's Production</h3>
+
+<div id="adminDailyReport"></div>
+
+</div>
+<div class="card">
+
+<h3>Returns History</h3>
+
+<div id="adminReturnsList"></div>
+
+</div>
+
+<div class="card">
+
+<h3>Wastage History</h3>
+
+<div id="adminWastageList"></div>
+
+</div>
+<div class="card">
+
+<h3>Low Stock Alerts</h3>
+
+<div id="lowStockList"></div>
+
+</div>
+<div class="card">
+
+<h3>Packaging Setup</h3>
+
+<select id="packProduct">
+<option>Mandazi</option>
+<option>Kaimati</option>
+<option>Gwashe</option>
+<option>Heart Cake</option>
+<option>Donuts</option>
+</select>
+
+<input
+id="piecesPerPacket"
+type="number"
+placeholder="Pieces Per Packet">
+
+<button onclick="savePackaging()">
+Save Packaging
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Packaging List</h3>
+
+<div id="packagingList"></div>
+
+</div>
+
+<div id="bakersList"></div>
+
+<div class="card">
+
+<h3>System Reset</h3>
+
+<button onclick="resetProduction()">
+Reset Production
+</button>
+
+<button onclick="resetWastage()">
+Reset Wastage
+</button>
+
+<button onclick="resetReturns()">
+Reset Returns
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="bakerPanel" class="hidden">
+
+<div class="card">
+
+<h3>Baker Dashboard</h3>
+
+<div id="welcomeBaker"></div>
+
+</div>
+
+<div class="card">
+
+<h3>Record Production</h3>
+
+<select id="prodItem">
+
+<option>Mandazi</option>
+
+<option>Kaimati</option>
+
+<option>Gwashe</option>
+
+<option>Heart Cake</option>
+
+<option>Donuts</option>
+
+</select>
+
+<input
+id="prodQty"
+type="number"
+placeholder="Packets Produced">
+
+<input
+id="flourUsed"
+type="number"
+placeholder="Flour Used">
+
+<input
+id="sugarUsed"
+type="number"
+placeholder="Sugar Used">
+
+<input
+id="oilUsed"
+type="number"
+placeholder="Oil Used">
+
+<input
+id="yeastUsed"
+type="number"
+placeholder="Yeast Used">
+
+<button onclick="saveProduction()">
+Save Production
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>My Production Today</h3>
+
+<div id="myProduction"></div>
+
+</div>
+<div class="card">
+
+<h3>Record Returns</h3>
+
+<select id="returnProduct">
+
+<option>Mandazi</option>
+
+<option>Kaimati</option>
+
+<option>Gwashe</option>
+
+<option>Heart Cake</option>
+
+<option>Donuts</option>
+
+</select>
+
+<input
+id="returnQty"
+type="number"
+placeholder="Quantity Returned">
+
+<input
+id="returnReason"
+placeholder="Reason">
+
+<button onclick="saveReturn()">
+Save Return
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Returns History</h3>
+
+<div id="returnsList"></div>
+
+</div>
+<div class="card">
+
+<h3>Daily Production Report</h3>
+
+<div id="dailyReport"></div>
+
+</div>
+
+<div class="card">
+
+<h3>Record Wastage</h3>
+
+<select id="wasteProduct">
+
+<option>Mandazi</option>
+<option>Kaimati</option>
+<option>Gwashe</option>
+<option>Heart Cake</option>
+<option>Donuts</option>
+
+</select>
+
+<input
+id="wasteQty"
+type="number"
+placeholder="Quantity Wasted">
+
+<input
+id="wasteReason"
+placeholder="Reason">
+
+<button onclick="saveWaste()">
+Save Wastage
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Wastage History</h3>
+
+<div id="wastageList"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import {
+initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+getDocs,
+getDoc,
+updateDoc,
+deleteDoc,
+doc,
+query,
+where,
+serverTimestamp
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyCweka5nHeCM8ZiptZgoYsw2QicD-NxRq8",
+
+authDomain: "waziri-inventory.firebaseapp.com",
+
+projectId: "waziri-inventory",
+
+storageBucket: "waziri-inventory.firebasestorage.app",
+
+messagingSenderId: "964616104781",
+
+appId: "1:964616104781:web:7b2d5fbe11bc3ccdc3a504"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+window.currentUser = null;
+
+window.login = async function(){
+
+const role =
+document.getElementById("role").value;
+
+const code =
+document.getElementById("loginCode").value.trim();
+
+if(role==="admin" && code==="6043"){
+
+document.getElementById("loginCard")
+.style.display="none";
+
+document.getElementById("adminPanel")
+.classList.remove("hidden");
+
+await loadBakers();
+await loadInventory();
+await loadLowStock();
+await loadPackaging();
+await loadInventoryHistory();
+await loadDailyReport();
+await loadWastage();
+await loadReturns();
+return;
+
+}
+
+if(role==="baker"){
+
+const q = query(
+collection(db,"users"),
+where("code","==",code)
+);
+
+const snap = await getDocs(q);
+
+if(snap.empty){
+
+alert("Invalid Baker Code");
+
+return;
+
+}
+
+const baker = snap.docs[0];
+
+const data = baker.data();
+
+if(!data.active){
+
+alert("Baker Disabled");
+
+return;
+
+}
+
+window.currentUser = {
+
+id:baker.id,
+...data
+
+};
+
+document.getElementById("loginCard")
+.style.display="none";
+
+document.getElementById("bakerPanel")
+.classList.remove("hidden");
+
+document.getElementById("welcomeBaker")
+.innerHTML =
+"Welcome " + data.name;
+
+loadMyProduction();
+loadWastage();
+
+return;
+
+}
+
+alert("Invalid Login");
+
+}
+
+window.saveBaker = async function(){
+
+const name =
+document.getElementById("bakerName").value.trim();
+
+const code =
+document.getElementById("bakerCode").value.trim();
+
+if(!name || !code){
+
+alert("Fill all fields");
+
+return;
+
+}
+
+await addDoc(collection(db,"users"),{
+
+name,
+
+code,
+
+role:"baker",
+
+active:true,
+
+created:serverTimestamp()
+
+});
+
+document.getElementById("bakerName").value="";
+
+document.getElementById("bakerCode").value="";
+
+alert("Baker Saved");
+
+loadBakers();
+
+}
+
+async function loadBakers(){
+
+const list =
+document.getElementById("bakersList");
+
+list.innerHTML="";
+
+const snap =
+await getDocs(collection(db,"users"));
+
+snap.forEach(docSnap=>{
+
+const b = {
+
+id:docSnap.id,
+...docSnap.data()
+
+};
+
+const div =
+document.createElement("div");
+
+div.className="userCard";
+
+div.innerHTML=`
+
+<b>${b.name}</b><br>
+
+Code: ${b.code}<br>
+
+Status:
+${b.active ? "✅ Active" : "❌ Disabled"}
+
+<br><br>
+
+<button onclick="toggleBaker('${b.id}',${b.active})">
+
+${b.active ? "Disable" : "Activate"}
+
+</button>
+
+`;
+
+list.appendChild(div);
+
+});
+
+}
+
+window.toggleBaker = async function(id,state){
+
+await updateDoc(
+doc(db,"users",id),
+{
+active:!state
+}
+);
+
+loadBakers();
+
+}
+
+window.saveProduction = async function(){
+
+const item =
+document.getElementById("prodItem").value;
+
+const qtyProduced =
+Number(document.getElementById("prodQty").value);
+
+if(!qtyProduced){
+alert("Enter quantity");
+return;
+}
+
+let actualPieces = qtyProduced;
+
+const packageQuery = query(
+collection(db,"packaging"),
+where("product","==",item)
+);
+
+const packageSnap = await getDocs(packageQuery);
+
+if(!packageSnap.empty){
+
+const packData =
+packageSnap.docs[0].data();
+
+actualPieces =
+qtyProduced * packData.pieces;
+
+}
+
+const flourUsed =
+Number(document.getElementById("flourUsed").value || 0);
+
+const sugarUsed =
+Number(document.getElementById("sugarUsed").value || 0);
+
+const oilUsed =
+Number(document.getElementById("oilUsed").value || 0);
+
+const yeastUsed =
+Number(document.getElementById("yeastUsed").value || 0);
+const ingredientsUsed = [
+{
+ingredient:"Flour",
+qty: flourUsed
+},
+{
+ingredient:"Sugar",
+qty: sugarUsed
+},
+{
+ingredient:"Oil",
+qty: oilUsed
+},
+{
+ingredient:"Yeast",
+qty: yeastUsed
+}
+];
+for(const itemUsed of ingredientsUsed){
+
+if(itemUsed.qty <= 0) continue;
+
+const inventoryQuery = query(
+collection(db,"inventory"),
+where("ingredient","==",itemUsed.ingredient)
+);
+
+const inventorySnap =
+await getDocs(inventoryQuery);
+
+if(inventorySnap.empty){
+
+alert(
+itemUsed.ingredient +
+" not found in inventory"
+);
+
+return;
+
+}
+
+const stockDoc =
+inventorySnap.docs[0];
+
+const stock =
+stockDoc.data();
+
+if((stock.qty || 0) < itemUsed.qty){
+
+alert(
+"Not enough " +
+itemUsed.ingredient
+);
+
+return;
+
+}
+
+await updateDoc(
+doc(db,"inventory",stockDoc.id),
+{
+qty:(stock.qty || 0) - itemUsed.qty
+}
+);
+await addDoc(
+collection(db,"inventoryHistory"),
+{
+ingredient:itemUsed.ingredient,
+qty:itemUsed.qty,
+type:"Production Used",
+created:serverTimestamp()
+}
+);
+}
+
+await addDoc(
+collection(db,"production"),
+{
+bakerId: window.currentUser.id,
+bakerName: window.currentUser.name,
+item,
+qty: qtyProduced,
+flourUsed,
+sugarUsed,
+oilUsed,
+yeastUsed,
+created: serverTimestamp()
+}
+);
+
+alert("Production Saved And Inventory Updated");
+
+await loadMyProduction();
+await loadInventory();
+await loadLowStock();
+await loadInventoryHistory();
+await loadDailyReport();
+await loadReturns();
+}
+
+async function loadMyProduction(){
+
+if(!window.currentUser) return;
+
+const q = query(
+collection(db,"production"),
+where("bakerId","==",window.currentUser.id)
+);
+
+const snap = await getDocs(q);
+
+const div =
+document.getElementById("myProduction");
+
+if(!div) return;
+
+let html="";
+let total=0;
+
+snap.forEach(docSnap=>{
+
+const p=docSnap.data();
+
+total += Number(p.qty||0);
+
+html += `
+<div style="
+border-bottom:1px solid #ddd;
+padding:8px;
+">
+${p.item} - ${p.qty}
+<br>
+Cost: Ksh ${p.cost || 0}
+</div>
+`;
+
+});
+
+html += `
+<hr>
+<b>Total Produced: ${total}</b>
+`;
+
+div.innerHTML = html;
+
+}
+
+window.saveInventory = async function(){
+
+const ingredient =
+document.getElementById("ingredientName").value;
+
+const qty =
+Number(document.getElementById("ingredientQty").value);
+
+const cost =
+Number(document.getElementById("ingredientCost").value);
+
+if(!ingredient || !qty){
+
+alert("Fill all inventory fields");
+
+return;
+
+}
+
+await addDoc(
+collection(db,"inventory"),
+{
+ingredient,
+qty,
+cost,
+created:serverTimestamp()
+}
+);
+await addDoc(
+collection(db,"inventoryHistory"),
+{
+ingredient,
+qty,
+cost,
+type:"Stock Added",
+created:serverTimestamp()
+}
+);
+alert("Inventory Saved");
+
+await loadInventory();
+await loadLowStock();
+
+}
+window.resetReturns = async function(){
+
+if(!confirm(
+"Delete ALL returns records?"
+)){
+return;
+}
+
+const snap =
+await getDocs(
+collection(db,"returns")
+);
+
+for(const docSnap of snap.docs){
+
+await deleteDoc(
+doc(db,"returns",docSnap.id)
+);
+
+}
+
+alert("Returns Reset");
+
+loadReturns();
+
+}
+window.loadInventory = async function(){
+
+const div =
+document.getElementById("inventoryList");
+
+if(!div) return;
+
+const snap =
+await getDocs(collection(db,"inventory"));
+
+let html="";
+
+snap.forEach(docSnap=>{
+
+const i = {
+id: docSnap.id,
+...docSnap.data()
+};
+
+html += `
+<div style="
+padding:8px;
+border-bottom:1px solid #ddd;
+">
+<b>${i.ingredient}</b><br>
+Qty: ${i.qty}<br>
+Cost: Ksh ${i.cost}<br><br>
+
+<button onclick="editInventory(
+'${i.id}',
+'${i.ingredient}',
+${i.qty},
+${i.cost}
+)">
+Edit
+</button>
+
+</div>
+`;
+
+});
+
+div.innerHTML = html;
+let summary = "";
+
+snap.forEach(docSnap=>{
+
+const item = docSnap.data();
+
+summary += `
+<div style="
+padding:6px;
+border-bottom:1px solid #eee;
+">
+<b>${item.ingredient}</b> :
+${item.qty}
+</div>
+`;
+
+});
+
+const stockDiv =
+document.getElementById("stockSummary");
+
+if(stockDiv){
+
+stockDiv.innerHTML = summary;
+
+}
+};
+
+window.saveRecipe = async function(){
+
+const product =
+document.getElementById("recipeProduct").value;
+
+const ingredient =
+document.getElementById("recipeIngredient").value.trim();
+
+const qty =
+Number(document.getElementById("recipeQty").value);
+
+if(!ingredient || !qty){
+
+alert("Fill all recipe fields");
+
+return;
+
+}
+
+const output =
+Number(
+document.getElementById("recipeOutput").value
+);
+
+await addDoc(
+collection(db,"recipes"),
+{
+product,
+ingredient,
+qty,
+output,
+created:serverTimestamp()
+}
+);
+
+document.getElementById("recipeIngredient").value="";
+document.getElementById("recipeQty").value="";
+document.getElementById("recipeOutput").value="";
+alert("Recipe Saved");
+
+loadRecipes();
+
+}
+
+window.loadRecipes = async function(){
+
+const div =
+document.getElementById("recipeList");
+
+if(!div) return;
+
+const snap =
+await getDocs(collection(db,"recipes"));
+
+let html="";
+
+snap.forEach(docSnap=>{
+
+const r = docSnap.data();
+
+html += `
+<div style="
+padding:8px;
+border-bottom:1px solid #ddd;
+">
+<b>${r.product}</b><br>
+Output: ${r.output} Packets<br>
+${r.ingredient} : ${r.qty}
+</div>
+`;
+
+});
+
+div.innerHTML = html;
+
+};
+
+async function loadLowStock(){
+
+const div =
+document.getElementById("lowStockList");
+
+if(!div) return;
+
+const snap =
+await getDocs(collection(db,"inventory"));
+
+let html="";
+
+snap.forEach(docSnap=>{
+
+const item = docSnap.data();
+
+if(item.qty <= 10){
+
+html += `
+<div style="
+padding:10px;
+background:#ffe5e5;
+margin-bottom:5px;
+border-radius:6px;
+">
+⚠️ ${item.ingredient}
+is running low.
+Remaining: ${item.qty}
+</div>
+`;
+
+}
+
+});
+
+if(html===""){
+html = "✅ No low stock items";
+}
+
+div.innerHTML = html;
+
+}
+window.loadInventoryHistory = async function(){
+
+const div =
+document.getElementById("inventoryHistory");
+
+if(!div) return;
+
+const snap =
+await getDocs(
+collection(db,"inventoryHistory")
+);
+
+let html = "";
+
+snap.forEach(docSnap=>{
+
+const h = docSnap.data();
+
+html += `
+<div style="
+padding:8px;
+border-bottom:1px solid #ddd;
+">
+${h.ingredient}
++${h.qty}
+(${h.type})
+</div>
+`;
+
+});
+
+div.innerHTML = html;
+
+}
+window.loadDailyReport = async function(){
+
+const bakerDiv =
+document.getElementById("dailyReport");
+
+const adminDiv =
+document.getElementById("adminDailyReport");
+
+const snap =
+await getDocs(
+collection(db,"production")
+);
+
+let totals = {};
+
+snap.forEach(docSnap=>{
+
+const p = docSnap.data();
+
+if(!totals[p.item]){
+totals[p.item] = 0;
+}
+
+totals[p.item] += Number(p.qty || 0);
+
+});
+
+let html = "";
+
+for(const item in totals){
+
+html += `
+<div style="
+padding:8px;
+border-bottom:1px solid #ddd;
+">
+<b>${item}</b> :
+${totals[item]}
+</div>
+`;
+
+}
+
+if(html === ""){
+html = "No production recorded";
+}
+
+if(bakerDiv){
+bakerDiv.innerHTML = html;
+}
+
+if(adminDiv){
+adminDiv.innerHTML = html;
+}
+
+}
+window.savePackaging = async function(){
+
+const product =
+document.getElementById("packProduct").value;
+
+const pieces =
+Number(
+document.getElementById("piecesPerPacket").value
+);
+
+if(!pieces){
+
+alert("Enter pieces per packet");
+
+return;
+
+}
+
+await addDoc(
+collection(db,"packaging"),
+{
+product,
+pieces,
+created: serverTimestamp()
+}
+);
+
+alert("Packaging Saved");
+
+loadPackaging();
+
+}
+
+window.loadPackaging = async function(){
+
+const div =
+document.getElementById("packagingList");
+
+if(!div) return;
+
+const snap =
+await getDocs(collection(db,"packaging"));
+
+let html = "";
+
+snap.forEach(docSnap=>{
+
+const p = docSnap.data();
+
+html += `
+<div style="
+padding:8px;
+border-bottom:1px solid #ddd;
+">
+<b>${p.product}</b><br>
+${p.pieces} Pieces Per Packet
+<br><br>
+
+<button onclick="editPackaging(
+'${docSnap.id}',
+${p.pieces}
+)">
+Edit
+</button>
+
+<button onclick="deletePackaging(
+'${docSnap.id}'
+)">
+Delete
+</button>
+
+</div>
+`;
+
+});
+
+div.innerHTML = html;
+
+}
+
+window.editPackaging = async function(
+id,
+pieces
+){
+
+const newPieces =
+prompt(
+"Enter New Pieces Per Packet",
+pieces
+);
+
+if(newPieces === null) return;
+
+await updateDoc(
+doc(db,"packaging",id),
+{
+pieces:Number(newPieces)
+}
+);
+
+alert("Packaging Updated");
+
+loadPackaging();
+
+}
+window.deletePackaging = async function(id){
+
+const confirmDelete =
+confirm(
+"Delete this packaging record?"
+);
+
+if(!confirmDelete) return;
+
+await deleteDoc(
+doc(db,"packaging",id)
+);
+
+alert("Packaging Deleted");
+
+loadPackaging();
+
+}
+window.saveWaste = async function(){
+
+const ingredient =
+document.getElementById("wasteIngredient").value;
+
+const qty =
+Number(document.getElementById("wasteQty").value);
+
+const reason =
+document.getElementById("wasteReason").value;
+const productionQuery = query(
+collection(db,"production"),
+where("item","==",product)
+);
+
+const productionSnap =
+await getDocs(productionQuery);
+
+let totalProduced = 0;
+
+productionSnap.forEach(docSnap=>{
+
+totalProduced +=
+Number(docSnap.data().qty || 0);
+
+});
+
+const wastageSnap =
+await getDocs(collection(db,"wastage"));
+
+let totalWasted = 0;
+
+wastageSnap.forEach(docSnap=>{
+
+const w = docSnap.data();
+
+if(w.product === product){
+
+totalWasted +=
+Number(w.qty || 0);
+
+}
+
+});
+
+if((totalWasted + qty) > totalProduced){
+
+alert(
+"Cannot waste more than produced."
+);
+
+return;
+
+}
+if(!qty){
+
+alert("Enter quantity");
+
+return;
+
+}
+
+const inventoryQuery = query(
+collection(db,"inventory"),
+where("ingredient","==",ingredient)
+);
+
+const inventorySnap =
+await getDocs(inventoryQuery);
+
+if(inventorySnap.empty){
+
+alert("Ingredient not found");
+
+return;
+
+}
+
+const stockDoc =
+inventorySnap.docs[0];
+
+const stock =
+stockDoc.data();
+
+if(stock.qty < qty){
+
+alert("Not enough stock");
+
+return;
+
+}
+
+await updateDoc(
+doc(db,"inventory",stockDoc.id),
+{
+qty: stock.qty - qty
+}
+);
+
+await addDoc(
+collection(db,"wastage"),
+{
+ingredient,
+qty,
+reason,
+created: serverTimestamp()
+}
+);
+
+alert("Wastage Saved");
+
+document.getElementById("wasteQty").value="";
+document.getElementById("wasteReason").value="";
+
+loadWastage();
+loadInventory();
+loadLowStock();
+
+}
+window.saveReturn = async function(){
+
+const product =
+document.getElementById("returnProduct").value;
+
+const qty =
+Number(document.getElementById("returnQty").value);
+
+const reason =
+document.getElementById("returnReason").value;
+
+if(!qty){
+
+alert("Enter quantity");
+
+return;
+
+}
+
+await addDoc(
+collection(db,"returns"),
+{
+product,
+qty,
+reason,
+created: serverTimestamp()
+}
+);
+
+alert("Return Saved");
+
+document.getElementById("returnQty").value="";
+document.getElementById("returnReason").value="";
+
+loadReturns();
+
+}
+window.loadWastage = async function(){
+
+const div =
+document.getElementById("wastageList");
+
+if(!div) return;
+
+const snap =
+await getDocs(collection(db,"wastage"));
+
+let html = "";
+
+snap.forEach(docSnap=>{
+
+const w = docSnap.data();
+
+html += `
+<div style="
+padding:8px;
+border-bottom:1px solid #ddd;
+">
+<b>${w.ingredient}</b>
+- ${w.qty}
+<br>
+Reason:
+${w.reason}
+</div>
+`;
+
+});
+
+if(html===""){
+
+html = "No wastage recorded";
+
+}
+
+div.innerHTML = html;
+const adminDiv =
+document.getElementById("adminWastageList");
+
+if(adminDiv){
+
+adminDiv.innerHTML = html;
+
+}
+}
+window.editInventory = async function(
+id,
+ingredient,
+qty,
+cost
+){
+
+const newQty =
+prompt(
+"Enter New Quantity",
+qty
+);
+
+if(newQty === null) return;
+
+const newCost =
+prompt(
+"Enter New Cost",
+cost
+);
+
+if(newCost === null) return;
+
+await updateDoc(
+doc(db,"inventory",id),
+{
+qty:Number(newQty),
+cost:Number(newCost)
+}
+);
+
+alert("Inventory Updated");
+
+loadInventory();
+loadLowStock();
+
+}
+window.loadReturns = async function(){
+
+const div =
+document.getElementById("returnsList");
+
+if(!div) return;
+
+const snap =
+await getDocs(
+collection(db,"returns")
+);
+
+let html = "";
+
+snap.forEach(docSnap=>{
+
+const r = docSnap.data();
+
+html += `
+<div style="
+padding:8px;
+border-bottom:1px solid #ddd;
+">
+<b>${r.product}</b>
+- ${r.qty}
+<br>
+Reason:
+${r.reason}
+</div>
+`;
+
+});
+
+if(html===""){
+
+html = "No returns recorded";
+
+}
+
+div.innerHTML = html;
+const adminDiv =
+document.getElementById("adminReturnsList");
+
+if(adminDiv){
+
+adminDiv.innerHTML = html;
+
+}
+}
+
+window.onload = function(){
+
+console.log("Waziri Production Loaded");
+
+loadLowStock();
+
+};
+</script>
+</body>
+</html>

@@ -209,7 +209,20 @@ Save Packaging
 </div>
 
 <div id="bakersList"></div>
+<div class="card">
 
+<h3>Admin Settings</h3>
+
+<input
+id="newAdminPassword"
+type="password"
+placeholder="New Admin Password">
+
+<button onclick="changeAdminPassword()">
+Change Password
+</button>
+
+</div>
 <div class="card">
 
 <h3>System Reset</h3>
@@ -399,6 +412,7 @@ collection,
 addDoc,
 getDocs,
 getDoc,
+setDoc,
 updateDoc,
 deleteDoc,
 doc,
@@ -438,8 +452,30 @@ document.getElementById("role").value;
 const code =
 document.getElementById("loginCode").value.trim();
 
-if(role==="admin" && code==="6043"){
+if(role==="admin"){
+const adminDoc =
+await getDoc(
+doc(db,"adminSettings","admin")
+);
 
+if(!adminDoc.exists()){
+
+alert("Admin password not set");
+
+return;
+
+}
+
+const savedPassword =
+adminDoc.data().password;
+
+if(code !== savedPassword){
+
+alert("Wrong Admin Password");
+
+return;
+
+}
 document.getElementById("loginCard")
 .style.display="none";
 
@@ -515,7 +551,31 @@ return;
 alert("Invalid Login");
 
 }
+window.changeAdminPassword = async function(){
 
+const newPassword =
+document.getElementById("newAdminPassword").value;
+
+if(!newPassword){
+
+alert("Enter Password");
+
+return;
+
+}
+
+await setDoc(
+doc(db,"adminSettings","admin"),
+{
+password:newPassword
+}
+);
+
+alert("Admin Password Updated");
+
+document.getElementById("newAdminPassword").value="";
+
+}
 window.saveBaker = async function(){
 
 const name =

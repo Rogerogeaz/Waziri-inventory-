@@ -664,7 +664,7 @@ div.innerHTML=`
 Code: ${b.code}<br>
 
 Status:
-${b.active ? "✅ Active" : "❌ Disabled"}
+${b.active ? " Active" : " Disabled"}
 
 <br><br>
 
@@ -813,6 +813,51 @@ created:serverTimestamp()
 );
 }
 
+let productionCost = 0;
+
+const inventorySnap =
+await getDocs(collection(db,"inventory"));
+
+inventorySnap.forEach(docSnap=>{
+
+const stock = docSnap.data();
+
+const ingredient =
+(stock.ingredient || "").toLowerCase();
+
+const cost =
+Number(stock.cost || 0);
+
+if(ingredient === "flour"){
+
+productionCost +=
+flourUsed * cost;
+
+}
+
+if(ingredient === "sugar"){
+
+productionCost +=
+sugarUsed * cost;
+
+}
+
+if(ingredient === "oil"){
+
+productionCost +=
+oilUsed * cost;
+
+}
+
+if(ingredient === "yeast"){
+
+productionCost +=
+yeastUsed * cost;
+
+}
+
+});
+
 await addDoc(
 collection(db,"production"),
 {
@@ -824,6 +869,7 @@ flourUsed,
 sugarUsed,
 oilUsed,
 yeastUsed,
+productionCost,
 created: serverTimestamp()
 }
 );
@@ -870,7 +916,7 @@ padding:8px;
 ">
 ${p.item} - ${p.qty}
 <br>
-Cost: Ksh ${p.cost || 0}
+Cost: Ksh ${p.productionCost || 0}
 </div>
 `;
 
@@ -1142,7 +1188,7 @@ background:#ffe5e5;
 margin-bottom:5px;
 border-radius:6px;
 ">
-⚠️ ${item.ingredient}
+ ${item.ingredient}
 is running low.
 Remaining: ${item.qty}
 </div>
@@ -1153,7 +1199,7 @@ Remaining: ${item.qty}
 });
 
 if(html===""){
-html = "✅ No low stock items";
+html = " No low stock items";
 }
 
 div.innerHTML = html;
@@ -1488,12 +1534,35 @@ return;
 
 
 
+let totalQty = 0;
+
+let totalCost = 0;
+
+productionSnap.forEach(docSnap=>{
+
+const p = docSnap.data();
+
+totalQty += Number(p.qty || 0);
+
+totalCost += Number(p.productionCost || 0);
+
+});
+
+const loss =
+
+totalQty > 0
+
+? (totalCost / totalQty) * qty
+
+: 0;
+
 await addDoc(
 collection(db,"wastage"),
 {
 product,
 qty,
 reason,
+loss,
 created: serverTimestamp()
 }
 );
@@ -1694,13 +1763,84 @@ await getDocs(collection(db,"wastage"));
 
 let totalProduction = 0;
 
+let totalProductionCost = 0;
+let averageCostPerPacket = 0;
+let productTotals = {};
 production.forEach(docSnap=>{
 
+const p = docSnap.data();
+
 totalProduction +=
-Number(docSnap.data().qty || 0);
+Number(p.qty || 0);
+
+totalProductionCost +=
+Number(p.productionCost || 0);
+
+if(!productTotals[p.item]){
+
+productTotals[p.item] = 0;
+
+}
+
+productTotals[p.item] +=
+Number(p.qty || 0);
 
 });
+if(totalProduction > 0){
 
+averageCostPerPacket =
+totalProductionCost / totalProduction;
+
+}
+let mostProducedProduct = "None";
+
+let highestQty = 0;
+
+for(const product in productTotals){
+
+if(productTotals[product] > highestQty){
+
+highestQty = productTotals[product];
+
+mostProducedProduct =
+product + " (" + highestQty + ")";
+
+}
+
+}
+let totalReturns = 0;
+
+returns.forEach(docSnap=>{
+
+const r = docSnap.data();
+
+totalReturns +=
+Number(r.qty || 0);
+
+});
+let totalWastageLoss = 0;
+
+wastage.forEach(docSnap=>{
+
+const w = docSnap.data();
+
+totalWastageLoss +=
+Number(w.loss || 0);
+
+});
+let inventoryValue = 0;
+
+inventory.forEach(docSnap=>{
+
+const item = docSnap.data();
+
+inventoryValue +=
+
+Number(item.qty || 0) *
+
+Number(item.cost || 0);
+
+});
 let lowStock = 0;
 
 inventory.forEach(docSnap=>{
@@ -1719,9 +1859,23 @@ document.getElementById("dashboardSummary").innerHTML = `
 
 <b>Total Production:</b> ${totalProduction}<br><br>
 
-<b>Returns:</b> ${returns.size}<br><br>
+<b>💰 Total Production Cost:</b>
+KSh ${totalProductionCost.toFixed(2)}<br><br>
 
-<b>Wastage:</b> ${wastage.size}<br><br>
+<b>💵 Inventory Value Remaining:</b>
+KSh ${inventoryValue.toFixed(2)}<br><br>
+
+<b>💲 Average Cost Per Packet:</b>
+KSh ${averageCostPerPacket.toFixed(2)}<br><br>
+
+<b>📊 Most Produced Product:</b>
+${mostProducedProduct}<br><br>
+
+<b>↩️ Total Returns:</b>
+${totalReturns}<br><br>
+
+<b>🗑️ Total Wastage Loss:</b>
+KSh ${totalWastageLoss.toFixed(2)}<br><br>
 
 <b>Low Stock Items:</b> ${lowStock}
 

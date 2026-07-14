@@ -82,7 +82,17 @@ Login
 </div>
 
 <div id="adminPanel" class="hidden">
+<div class="card">
 
+<h3>Dashboard Summary</h3>
+
+<div id="dashboardSummary">
+
+Loading...
+
+</div>
+
+</div>
 <div class="card">
 
 <h3>Create Baker</h3>
@@ -121,7 +131,13 @@ placeholder="Quantity">
 id="ingredientCost"
 type="number"
 placeholder="Cost Per Unit">
-
+<select id="ingredientUnit">
+<option value="kg">Kilograms (kg)</option>
+<option value="litres">Litres</option>
+<option value="packets">Packets</option>
+<option value="pieces">Pieces</option>
+<option value="grams">Grams</option>
+</select>
 <button onclick="saveInventory()">
 Save Inventory
 </button>
@@ -137,7 +153,7 @@ Save Inventory
 
 </div>
 <h3>Inventory List</h3>
-
+<h3>Inventory List</h3>
 <div id="inventoryList"></div>
 
 </div>
@@ -490,6 +506,7 @@ await loadInventoryHistory();
 await loadDailyReport();
 await loadWastage();
 await loadReturns();
+await loadDashboard();
 return;
 
 }
@@ -871,12 +888,16 @@ div.innerHTML = html;
 window.saveInventory = async function(){
 
 const ingredient =
-document.getElementById("ingredientName").value;
+document.getElementById("ingredientName").value.trim();
+
 const qty =
 Number(document.getElementById("ingredientQty").value);
 
 const cost =
 Number(document.getElementById("ingredientCost").value);
+
+const unit =
+document.getElementById("ingredientUnit").value;
 
 if(!ingredient || !qty){
 
@@ -886,55 +907,64 @@ return;
 
 }
 
+const q = query(
+collection(db,"inventory"),
+where("ingredient","==",ingredient)
+);
+
+const snap = await getDocs(q);
+
+if(snap.empty){
+
 await addDoc(
 collection(db,"inventory"),
 {
 ingredient,
 qty,
 cost,
+unit,
 created:serverTimestamp()
 }
 );
+
+}else{
+
+const stockDoc = snap.docs[0];
+
+const stock = stockDoc.data();
+
+await updateDoc(
+doc(db,"inventory",stockDoc.id),
+{
+qty:(stock.qty || 0) + qty,
+cost,
+unit
+}
+);
+
+}
+
 await addDoc(
 collection(db,"inventoryHistory"),
 {
 ingredient,
 qty,
 cost,
+unit,
 type:"Stock Added",
 created:serverTimestamp()
 }
 );
+
 alert("Inventory Saved");
+
+document.getElementById("ingredientName").value="";
+document.getElementById("ingredientQty").value="";
+document.getElementById("ingredientCost").value="";
 
 await loadInventory();
 await loadLowStock();
-
-}
-window.resetReturns = async function(){
-
-if(!confirm(
-"Delete ALL returns records?"
-)){
-return;
-}
-
-const snap =
-await getDocs(
-collection(db,"returns")
-);
-
-for(const docSnap of snap.docs){
-
-await deleteDoc(
-doc(db,"returns",docSnap.id)
-);
-
-}
-
-alert("Returns Reset");
-
-loadReturns();
+await loadInventoryHistory();
 
 }
 window.loadInventory = async function(){
@@ -962,8 +992,10 @@ padding:8px;
 border-bottom:1px solid #ddd;
 ">
 <b>${i.ingredient}</b><br>
-Qty: ${i.qty}<br>
-Cost: Ksh ${i.cost}<br><br>
+
+Qty: ${i.qty} ${i.unit || ""}<br>
+
+Cost: Ksh ${i.cost} per ${i.unit || "unit"}<br><br>
 
 <button onclick="editInventory(
 '${i.id}',
@@ -992,7 +1024,7 @@ padding:6px;
 border-bottom:1px solid #eee;
 ">
 <b>${item.ingredient}</b> :
-${item.qty}
+${item.qty} ${item.unit || ""}
 </div>
 `;
 
@@ -1144,15 +1176,27 @@ let html = "";
 snap.forEach(docSnap=>{
 
 const h = docSnap.data();
+let date = "";
 
+if(h.created){
+date = h.created.toDate().toLocaleString();
+}
 html += `
 <div style="
 padding:8px;
 border-bottom:1px solid #ddd;
 ">
-${h.ingredient}
+
+<small style="color:gray;">
+${date}
+</small><br>
+
+<b>${h.ingredient}</b>
+
 +${h.qty}
+
 (${h.type})
+
 </div>
 `;
 
@@ -1634,7 +1678,79 @@ adminDiv.innerHTML = html;
 
 }
 }
+window.loadDashboard = async function(){
 
+const inventory =
+await getDocs(collection(db,"inventory"));
+
+const production =
+await getDocs(collection(db,"production"));
+
+const returns =
+await getDocs(collection(db,"returns"));
+
+const wastage =
+await getDocs(collection(db,"wastage"));
+
+let totalProduction = 0;
+
+production.forEach(docSnap=>{
+
+totalProduction +=
+Number(docSnap.data().qty || 0);
+
+});
+
+let lowStock = 0;
+
+inventory.forEach(docSnap=>{
+
+if((docSnap.data().qty || 0) <= 10){
+
+lowStock++;
+
+}
+
+});
+
+document.getElementById("dashboardSummary").innerHTML = `
+
+<b>Inventory Items:</b> ${inventory.size}<br><br>
+
+<b>Total Production:</b> ${totalProduction}<br><br>
+
+<b>Returns:</b> ${returns.size}<br><br>
+
+<b>Wastage:</b> ${wastage.size}<br><br>
+
+<b>Low Stock Items:</b> ${lowStock}
+
+`;
+
+}
+window.filterInventory = function(){
+
+const search =
+document.getElementById("inventorySearch")
+.value
+.toLowerCase();
+
+const cards =
+document.querySelectorAll("#inventoryList > div");
+
+cards.forEach(card=>{
+
+const text =
+card.innerText.toLowerCase();
+
+card.style.display =
+text.includes(search)
+? "block"
+: "none";
+
+});
+
+}
 window.onload = function(){
 
 console.log("Waziri Production Loaded");

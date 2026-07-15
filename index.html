@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Waziri Production System</title>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 
 body{
@@ -114,6 +114,11 @@ Save Baker
 <div class="card">
 
 <h3>Registered Bakers</h3>
+
+<div id="bakersList"></div>
+
+</div>
+
 <div class="card">
 
 <h3>Inventory</h3>
@@ -152,7 +157,6 @@ Save Inventory
 <div id="stockSummary"></div>
 
 </div>
-<h3>Inventory List</h3>
 <h3>Inventory List</h3>
 <div id="inventoryList"></div>
 
@@ -223,8 +227,39 @@ Save Packaging
 <div id="packagingList"></div>
 
 </div>
+<div class="card">
 
-<div id="bakersList"></div>
+<h3><i class="fa-solid fa-tags"></i> Product Selling Prices</h3>
+
+<select id="priceProduct">
+
+<option>Mandazi</option>
+<option>Kaimati</option>
+<option>Gwashe</option>
+<option>Heart Cake</option>
+<option>Donuts</option>
+
+</select>
+
+<input
+id="sellingPrice"
+type="number"
+placeholder="Selling Price Per Packet">
+
+<button onclick="saveSellingPrice()">
+Save Price
+</button>
+
+<h3>Current Prices</h3>
+
+<div id="priceList">
+
+No prices saved.
+
+</div>
+
+</div>
+
 <div class="card">
 
 <h3>Admin Settings</h3>
@@ -502,6 +537,7 @@ await loadBakers();
 await loadInventory();
 await loadLowStock();
 await loadPackaging();
+await loadSellingPrices();
 await loadInventoryHistory();
 await loadDailyReport();
 await loadWastage();
@@ -1843,11 +1879,17 @@ Number(item.cost || 0);
 });
 let lowStock = 0;
 
+let lowStockNames = [];
+
 inventory.forEach(docSnap=>{
 
-if((docSnap.data().qty || 0) <= 10){
+const item = docSnap.data();
+
+if((item.qty || 0) <= 10){
 
 lowStock++;
+
+lowStockNames.push(item.ingredient);
 
 }
 
@@ -1855,31 +1897,130 @@ lowStock++;
 
 document.getElementById("dashboardSummary").innerHTML = `
 
-<b>Inventory Items:</b> ${inventory.size}<br><br>
+<h3 style="color:#C57C2D;"><i class="fa-solid fa-chart-column"></i> Production</h3>
 
-<b>Total Production:</b> ${totalProduction}<br><br>
+<div style="padding:10px;border-bottom:1px solid #ddd;">
+<i class="fa-solid fa-box"></i> <b>Total Packets Produced</b><br>
+<span style="font-size:22px;color:#C57C2D;">
+${totalProduction}
+</span>
+</div>
 
-<b>💰 Total Production Cost:</b>
-KSh ${totalProductionCost.toFixed(2)}<br><br>
+<div style="padding:10px;border-bottom:1px solid #ddd;">
+<i class="fa-solid fa-coins"></i> <b>Total Production Cost</b><br>
+<span style="font-size:22px;color:#C57C2D;">
+KSh ${totalProductionCost.toFixed(2)}
+</span>
+</div>
 
-<b>💵 Inventory Value Remaining:</b>
-KSh ${inventoryValue.toFixed(2)}<br><br>
+<hr>
 
-<b>💲 Average Cost Per Packet:</b>
-KSh ${averageCostPerPacket.toFixed(2)}<br><br>
+<h3 style="color:#C57C2D;"><i class="fa-solid fa-warehouse"></i> Inventory</h3>
 
-<b>📊 Most Produced Product:</b>
-${mostProducedProduct}<br><br>
+<div style="padding:10px;border-bottom:1px solid #ddd;">
+<i class="fa-solid fa-warehouse"></i> <b>Inventory Value Remaining</b><br>
+<span style="font-size:22px;color:#C57C2D;">
+KSh ${inventoryValue.toFixed(2)}
+</span>
+</div>
 
-<b>↩️ Total Returns:</b>
-${totalReturns}<br><br>
+<hr>
 
-<b>🗑️ Total Wastage Loss:</b>
-KSh ${totalWastageLoss.toFixed(2)}<br><br>
+<h3 style="color:#C57C2D;"><i class="fa-solid fa-chart-line"></i> Financial</h3>
 
-<b>Low Stock Items:</b> ${lowStock}
+<div style="padding:10px;border-bottom:1px solid #ddd;">
+ðŸ’° <b>Total Production Cost</b><br>
+<span style="font-size:22px;color:#C57C2D;">
+KSh ${totalProductionCost.toFixed(2)}
+</span>
+</div>
+
+<div style="padding:10px;border-bottom:1px solid #ddd;">
+<i class="fa-solid fa-trash"></i> <b>Total Wastage Loss</b><br>
+<span style="font-size:22px;color:#C57C2D;">
+KSh ${totalWastageLoss.toFixed(2)}
+</span>
+</div>
+
+<div style="padding:10px;border-bottom:1px solid #ddd;">
+<i class="fa-solid fa-rotate-left"></i> <b>Total Returns</b><br>
+<span style="font-size:22px;color:#C57C2D;">
+${totalReturns}
+</span>
+</div>
+
+<div style="padding:10px;border-bottom:1px solid #ddd;">
+<i class="fa-solid fa-calculator"></i> <b>Average Cost Per Packet</b><br>
+<span style="font-size:22px;color:#C57C2D;">
+KSh ${averageCostPerPacket.toFixed(2)}
+</span>
+</div>
+
+<div style="padding:10px;border-bottom:1px solid #ddd;">
+<i class="fa-solid fa-trophy"></i> <b>Most Produced Product</b><br>
+<span style="font-size:22px;color:#C57C2D;">
+${mostProducedProduct}
+</span>
+</div>
+
+<div style="padding:10px;">
+<i class="fa-solid fa-triangle-exclamation"></i> <b>Low Stock Items (${lowStock})</b><br>
+${lowStockNames.length ? lowStockNames.join(", ") : "None"}
+</div>
 
 `;
+
+}
+window.saveSellingPrice = async function(){
+
+const product =
+document.getElementById("priceProduct").value;
+
+const price =
+Number(document.getElementById("sellingPrice").value);
+
+if(!price){
+
+alert("Enter selling price");
+
+return;
+
+}
+
+const q = query(
+collection(db,"sellingPrices"),
+where("product","==",product)
+);
+
+const snap = await getDocs(q);
+
+if(snap.empty){
+
+await addDoc(
+collection(db,"sellingPrices"),
+{
+product,
+price,
+created:serverTimestamp()
+}
+);
+
+}else{
+
+await updateDoc(
+doc(db,"sellingPrices",snap.docs[0].id),
+{
+price
+}
+);
+
+}
+
+alert("Selling Price Saved");
+
+document.getElementById("sellingPrice").value="";
+
+loadSellingPrices();
 
 }
 window.filterInventory = function(){
@@ -1903,6 +2044,40 @@ text.includes(search)
 : "none";
 
 });
+
+}
+window.loadSellingPrices = async function(){
+
+const div =
+document.getElementById("priceList");
+
+if(!div) return;
+
+const snap =
+await getDocs(collection(db,"sellingPrices"));
+
+let html = "";
+
+snap.forEach(docSnap=>{
+
+const p = docSnap.data();
+
+html += `
+<div style="padding:8px;border-bottom:1px solid #ddd;">
+<b>${p.product}</b><br>
+KSh ${Number(p.price || 0).toFixed(2)} per packet
+</div>
+`;
+
+});
+
+if(html===""){
+
+html = "No prices saved.";
+
+}
+
+div.innerHTML = html;
 
 }
 window.onload = function(){

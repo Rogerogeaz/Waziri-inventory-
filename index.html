@@ -69,6 +69,10 @@ padding:10px 0;
 
 <option value="admin">Admin</option>
 
+<option value="storekeeper">Storekeeper</option>
+
+<option value="dispatcher">Dispatcher</option>
+
 <option value="baker">Baker</option>
 
 </select>
@@ -80,7 +84,9 @@ Login
 </button>
 
 </div>
-
+<button onclick="logout()" style="background:red;">
+Logout
+</button>
 <div id="adminPanel" class="hidden">
 <div class="card">
 
@@ -96,56 +102,44 @@ Loading...
 <div class="card">
 
 <h3>Create Baker</h3>
+<div class="card">
 
-<input id="bakerName" placeholder="Baker Name">
+<h3>Create Raider</h3>
 
-<input id="bakerCode" placeholder="Baker Login Code">
+<input
+id="raiderUserName"
+placeholder="Raider Name">
 
-<button onclick="saveBaker()">
-Save Baker
+<input
+id="raiderUserCode"
+placeholder="Login Code">
+
+<button onclick="saveRaider()">
+Save Raider
+</button>
+
+</div>
+
+<input id="bakerName" placeholder="Name">
+
+<input id="bakerCode" placeholder="Login Code">
+
+<select id="userRole">
+<option value="baker">Baker</option>
+<option value="storekeeper">Storekeeper</option>
+<option value="dispatcher">Dispatcher</option>
+</select>
+
+<button onclick="saveUser()">
+Save User
 </button>
 
 </div>
 <div class="card">
 
-
-
-</div>
-<div class="card">
-
-<h3>Registered Bakers</h3>
+<h3>Registered Users</h3>
 
 <div id="bakersList"></div>
-
-</div>
-
-<div class="card">
-
-<h3>Inventory</h3>
-
-<input
-id="ingredientName"
-placeholder="Ingredient Name">
-
-<input
-id="ingredientQty"
-type="number"
-placeholder="Quantity">
-
-<input
-id="ingredientCost"
-type="number"
-placeholder="Cost Per Unit">
-<select id="ingredientUnit">
-<option value="kg">Kilograms (kg)</option>
-<option value="litres">Litres</option>
-<option value="packets">Packets</option>
-<option value="pieces">Pieces</option>
-<option value="grams">Grams</option>
-</select>
-<button onclick="saveInventory()">
-Save Inventory
-</button>
 
 </div>
 
@@ -153,11 +147,25 @@ Save Inventory
 <div class="card">
 
 <h3>Current Stock Summary</h3>
+<div class="card">
 
+<h3>Finished Products Stock</h3>
+
+<div id="finishedStockList">
+No finished products available.
+</div>
+
+</div>
 <div id="stockSummary"></div>
 
 </div>
 <h3>Inventory List</h3>
+
+<input
+id="inventorySearch"
+placeholder="Search Inventory"
+onkeyup="filterInventory()">
+
 <div id="inventoryList"></div>
 
 </div>
@@ -185,6 +193,18 @@ Save Inventory
 
 <div class="card">
 
+<h3>Day Closure History</h3>
+
+<div id="dayClosureHistory">
+
+No day closures yet.
+
+</div>
+
+</div>
+
+<div class="card">
+
 <h3>Wastage History</h3>
 
 <div id="adminWastageList"></div>
@@ -195,6 +215,51 @@ Save Inventory
 <h3>Low Stock Alerts</h3>
 
 <div id="lowStockList"></div>
+
+</div>
+<div class="card">
+
+<h3>Recipe Setup</h3>
+
+<select id="recipeProduct">
+
+<option>Mandazi</option>
+<option>Kaimati</option>
+<option>Gwashe</option>
+<option>Heart Cake</option>
+<option>Donuts</option>
+
+</select>
+
+<select id="recipeIngredient">
+
+</select>
+
+<input
+id="recipeQty"
+type="number"
+placeholder="Quantity Required">
+
+<input
+id="recipeOutput"
+type="number"
+placeholder="Packets Produced">
+
+<button onclick="saveRecipe()">
+Save Recipe
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Recipe List</h3>
+
+<div id="recipeList">
+
+No recipes saved.
+
+</div>
 
 </div>
 <div class="card">
@@ -289,11 +354,222 @@ Reset Wastage
 <button onclick="resetReturns()">
 Reset Returns
 </button>
+<button onclick="resetAllData()">
+Reset ALL Data
+</button>
+</div>
+
+</div>
+
+</div>
+<div id="storePanel" class="hidden">
+
+<div class="card">
+
+<h3>Storekeeper Dashboard</h3>
+
+<div id="welcomeStorekeeper"></div>
+
+</div>
+<div class="card">
+
+<h3>Inventory</h3>
+
+<input
+id="ingredientName"
+placeholder="Ingredient Name">
+
+<input
+id="ingredientQty"
+type="number"
+placeholder="Quantity">
+
+<input
+id="ingredientCost"
+type="number"
+placeholder="Cost Per Unit">
+
+<select id="ingredientUnit">
+    <option value="kg">Kilograms (kg)</option>
+    <option value="litres">Litres</option>
+    <option value="packets">Packets</option>
+    <option value="pieces">Pieces</option>
+    <option value="grams">Grams</option>
+</select>
+
+<button onclick="saveInventory()">
+Save Inventory
+</button>
+
+<hr>
+
+<h3>Current Inventory</h3>
+
+<div id="storeInventoryList">
+No inventory available.
+</div>
+
+</div>
+<div class="card">
+
+<h3>Issue Ingredients To Baker</h3>
+
+<select id="issueBaker"></select>
+
+<select id="issueIngredient"></select>
+
+<input
+id="issueQty"
+type="number"
+placeholder="Quantity">
+
+<button onclick="issueIngredient()">
+Issue Ingredient
+</button>
+
+<hr>
+
+<h3>Ingredients Currently With Bakers</h3>
+
+<div id="bakerIssueBalances">
+No ingredients issued.
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Receive Ingredients Back</h3>
+
+<select id="returnBaker"></select>
+
+<select id="returnIngredient"></select>
+
+<input
+id="returnIngredientQty"
+type="number"
+placeholder="Quantity Returned">
+
+<button onclick="receiveIngredientReturn()">
+Receive Return
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Issue History</h3>
+
+<div id="issueHistory"></div>
 
 </div>
 
 </div>
 
+<div id="dispatcherPanel" class="hidden">
+
+<div class="card">
+
+<h3>Dispatcher Dashboard</h3>
+
+<div id="welcomeDispatcher"></div>
+
+</div>
+
+<div class="card">
+
+<h3>Issue Products To Raider</h3>
+
+<select id="raiderIssueName">
+<option value="">Select Raider</option>
+</select>
+
+<select id="issueProduct">
+<option>Mandazi</option>
+<option>Kaimati</option>
+<option>Gwashe</option>
+<option>Heart Cake</option>
+<option>Donuts</option>
+</select>
+
+<input
+id="issueProductQty"
+type="number"
+placeholder="Quantity">
+
+<button onclick="issueToRaider()">
+Issue Products
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Receive Raider Returns</h3>
+
+<select id="raiderName">
+<option value="">Select Raider</option>
+</select>
+
+<select id="dispatchProduct">
+<option>Mandazi</option>
+<option>Kaimati</option>
+<option>Gwashe</option>
+<option>Heart Cake</option>
+<option>Donuts</option>
+</select>
+
+<input
+id="dispatchQty"
+type="number"
+placeholder="Quantity Returned">
+
+<select id="dispatchReturnType">
+
+<option value="good">Good Return</option>
+
+<option value="damaged">Damaged Return</option>
+
+</select>
+
+<input
+id="dispatchReason"
+placeholder="Reason (Optional)">
+
+<button onclick="receiveSalesReturn()">
+Receive Return
+</button>
+
+</div>
+<div class="card">
+
+<h3>Products With Raiders</h3>
+
+<div id="raiderStock">
+No products issued.
+</div>
+
+</div>
+<div class="card">
+
+<h3>Sales Returns History</h3>
+
+<div id="dispatchHistory"></div>
+
+</div>
+<div class="card">
+
+<h3>Close Day Shift</h3>
+
+<div id="closeSummary" style="margin-bottom:10px;color:#555;">
+Reconcile all dispatches after all raiders have returned.
+</div>
+
+<button onclick="closeDayShift()">
+Close Day Shift
+</button>
+
+</div>
 </div>
 
 <div id="bakerPanel" class="hidden">
@@ -305,7 +581,17 @@ Reset Returns
 <div id="welcomeBaker"></div>
 
 </div>
+<div class="card">
 
+<h3>My Issued Ingredients</h3>
+
+<div id="myIngredients">
+
+No ingredients issued.
+
+</div>
+
+</div>
 <div class="card">
 
 <h3>Record Production</h3>
@@ -329,26 +615,6 @@ id="prodQty"
 type="number"
 placeholder="Packets Produced">
 
-<input
-id="flourUsed"
-type="number"
-placeholder="Flour Used">
-
-<input
-id="sugarUsed"
-type="number"
-placeholder="Sugar Used">
-
-<input
-id="oilUsed"
-type="number"
-placeholder="Oil Used">
-
-<input
-id="yeastUsed"
-type="number"
-placeholder="Yeast Used">
-
 <button onclick="saveProduction()">
 Save Production
 </button>
@@ -362,7 +628,7 @@ Save Production
 <div id="myProduction"></div>
 
 </div>
-<div class="card">
+<div class="card hidden">
 
 <h3>Record Returns</h3>
 
@@ -395,7 +661,7 @@ Save Return
 
 </div>
 
-<div class="card">
+<div class="card hidden">
 
 <h3>Returns History</h3>
 
@@ -469,6 +735,8 @@ deleteDoc,
 doc,
 query,
 where,
+orderBy,
+Timestamp,
 serverTimestamp
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -496,7 +764,10 @@ const db = getFirestore(app);
 window.currentUser = null;
 
 window.login = async function(){
-
+document.getElementById("adminPanel").className = "hidden";
+document.getElementById("storePanel").className = "hidden";
+document.getElementById("bakerPanel").className = "hidden";
+document.getElementById("dispatcherPanel").className = "hidden";
 const role =
 document.getElementById("role").value;
 
@@ -537,21 +808,32 @@ await loadBakers();
 await loadInventory();
 await loadLowStock();
 await loadPackaging();
+await loadRecipeIngredients();
+await loadFinishedStock();
 await loadSellingPrices();
 await loadInventoryHistory();
 await loadDailyReport();
 await loadWastage();
 await loadReturns();
 await loadDashboard();
+await loadBakerOptions();
+await loadIssueHistory();
+await loadRecipes();
+await loadDayClosures();
 return;
 
 }
 
-if(role==="baker"){
+if(
+role==="baker" ||
+role==="storekeeper" ||
+role==="dispatcher"
+){
 
 const q = query(
 collection(db,"users"),
-where("code","==",code)
+where("code","==",code),
+where("role","==",role)
 );
 
 const snap = await getDocs(q);
@@ -586,22 +868,65 @@ id:baker.id,
 document.getElementById("loginCard")
 .style.display="none";
 
+if(data.role === "baker"){
+
 document.getElementById("bakerPanel")
 .classList.remove("hidden");
 
-document.getElementById("welcomeBaker")
-.innerHTML =
-"Welcome " + data.name;
+document.getElementById("welcomeBaker").innerHTML =
+"Welcome Baker: " + data.name;
 
 loadMyProduction();
 loadWastage();
 loadReturns();
 loadDailyReport();
+await loadMyIngredients();
+}else if(data.role === "storekeeper"){
+
+document.getElementById("storePanel")
+.classList.remove("hidden");
+
+document.getElementById("welcomeStorekeeper").innerHTML =
+"Welcome Storekeeper: " + data.name;
+
+await loadBakerOptions();
+await loadRecipeIngredients();
+await loadInventory();
+await loadBakerIssueBalances();
+await loadIssueHistory();
+}else if(data.role === "dispatcher"){
+
+document.getElementById("dispatcherPanel")
+.classList.remove("hidden");
+
+document.getElementById("welcomeDispatcher").innerHTML =
+"Welcome Dispatcher: " + data.name;
+
+await loadRaiderOptions();
+await loadDispatchHistory();
+await loadRaiderStock();
+
+}
+
 return;
 
 }
 
 alert("Invalid Login");
+
+}
+window.logout = function(){
+
+window.currentUser = null;
+
+document.getElementById("adminPanel").classList.add("hidden");
+document.getElementById("storePanel").classList.add("hidden");
+document.getElementById("dispatcherPanel").classList.add("hidden");
+document.getElementById("bakerPanel").classList.add("hidden");
+
+document.getElementById("loginCard").style.display = "block";
+
+document.getElementById("loginCode").value = "";
 
 }
 window.changeAdminPassword = async function(){
@@ -629,13 +954,16 @@ alert("Admin Password Updated");
 document.getElementById("newAdminPassword").value="";
 
 }
-window.saveBaker = async function(){
+window.saveUser = async function(){
 
 const name =
 document.getElementById("bakerName").value.trim();
 
 const code =
 document.getElementById("bakerCode").value.trim();
+
+const role =
+document.getElementById("userRole").value;
 
 if(!name || !code){
 
@@ -648,68 +976,91 @@ return;
 await addDoc(collection(db,"users"),{
 
 name,
-
 code,
-
-role:"baker",
-
+role,
 active:true,
-
 created:serverTimestamp()
 
 });
 
 document.getElementById("bakerName").value="";
-
 document.getElementById("bakerCode").value="";
+document.getElementById("userRole").value="baker";
 
-alert("Baker Saved");
+alert("User Saved");
 
 loadBakers();
 
 }
+window.saveRaider = async function(){
 
+const name =
+document.getElementById("raiderUserName").value.trim();
+
+const code =
+document.getElementById("raiderUserCode").value.trim();
+
+if(!name || !code){
+
+alert("Fill all fields");
+return;
+
+}
+
+await addDoc(
+collection(db,"users"),
+{
+name,
+code,
+role:"raider",
+active:true,
+created:serverTimestamp()
+}
+);
+
+document.getElementById("raiderUserName").value="";
+document.getElementById("raiderUserCode").value="";
+
+alert("Raider Saved");
+
+loadBakers();
+
+}
 async function loadBakers(){
 
-const list =
-document.getElementById("bakersList");
+const list = document.getElementById("bakersList");
 
-list.innerHTML="";
+if(!list) return;
 
-const snap =
-await getDocs(collection(db,"users"));
+list.innerHTML = "";
+
+const snap = await getDocs(collection(db,"users"));
 
 snap.forEach(docSnap=>{
 
 const b = {
-
-id:docSnap.id,
+id: docSnap.id,
 ...docSnap.data()
-
 };
 
-const div =
-document.createElement("div");
+const div = document.createElement("div");
 
-div.className="userCard";
+div.className = "userCard";
 
-div.innerHTML=`
-
+div.innerHTML = `
 <b>${b.name}</b><br>
+
+Role: ${b.role}<br>
 
 Code: ${b.code}<br>
 
-Status:
-${b.active ? " Active" : " Disabled"}
+Status: ${b.active ? "Active" : "Disabled"}
 
 <br><br>
 
 <button onclick="toggleBaker('${b.id}',${b.active})">
-
 ${b.active ? "Disable" : "Activate"}
-
 </button>
-
 `;
 
 list.appendChild(div);
@@ -730,7 +1081,644 @@ active:!state
 loadBakers();
 
 }
+window.loadBakerOptions = async function(){
 
+const select =
+document.getElementById("issueBaker");
+
+if(!select) return;
+
+select.innerHTML = "";
+
+const q = query(
+collection(db,"users"),
+where("role","==","baker")
+);
+
+const snap = await getDocs(q);
+
+snap.forEach(docSnap=>{
+
+const b = docSnap.data();
+
+select.innerHTML += `
+<option value="${docSnap.id}">
+${b.name}
+</option>
+`;
+
+});
+
+const returnSelect =
+document.getElementById("returnBaker");
+
+if(returnSelect){
+
+returnSelect.innerHTML =
+select.innerHTML;
+
+}
+
+}
+window.loadRaiderOptions = async function(){
+
+const issueSelect = document.getElementById("raiderIssueName");
+const returnSelect = document.getElementById("raiderName");
+
+if(!issueSelect || !returnSelect) return;
+
+issueSelect.innerHTML =
+'<option value="">Select Raider</option>';
+
+returnSelect.innerHTML =
+'<option value="">Select Raider</option>';
+
+const q = query(
+collection(db,"users"),
+where("role","==","raider"),
+where("active","==",true)
+);
+
+const snap = await getDocs(q);
+
+snap.forEach(docSnap=>{
+
+const r = docSnap.data();
+
+issueSelect.innerHTML += `
+<option value="${r.name}">
+${r.name}
+</option>
+`;
+
+returnSelect.innerHTML += `
+<option value="${r.name}">
+${r.name}
+</option>
+`;
+
+});
+
+}
+window.issueIngredient = async function(){
+
+const bakerId =
+document.getElementById("issueBaker").value;
+
+const ingredient =
+document.getElementById("issueIngredient").value.trim();
+
+const qty =
+Number(document.getElementById("issueQty").value);
+
+if(!ingredient || !qty){
+
+alert("Fill all fields");
+
+return;
+
+}
+
+const q = query(
+collection(db,"inventory"),
+where("ingredient","==", ingredient)
+);
+
+const snap = await getDocs(q);
+
+if(snap.empty){
+
+alert("Ingredient not found");
+
+return;
+
+}
+
+const stockDoc = snap.docs[0];
+
+const stock = stockDoc.data();
+
+if((stock.qty || 0) < qty){
+
+alert("Not enough stock");
+
+return;
+
+}
+
+await updateDoc(
+doc(db,"inventory",stockDoc.id),
+{
+qty:(stock.qty || 0) - qty
+}
+);
+
+await addDoc(
+collection(db,"ingredientIssues"),
+{
+bakerId,
+bakerName: document.getElementById("issueBaker").options[
+document.getElementById("issueBaker").selectedIndex
+].text,
+ingredient,
+qty,
+unit: stock.unit || "",
+issuedBy: window.currentUser.name,
+created: serverTimestamp()
+}
+);
+
+await addDoc(
+collection(db,"inventoryHistory"),
+{
+ingredient,
+qty,
+unit: stock.unit || "",
+type:"Issued To Baker",
+created:serverTimestamp()
+}
+);
+
+alert("Ingredients Issued");
+
+await loadIssueHistory();
+await loadBakerIssueBalances();
+
+await loadInventory();
+await loadInventoryHistory();
+
+}
+window.receiveIngredientReturn = async function(){
+
+const bakerId =
+document.getElementById("returnBaker").value;
+
+const ingredient =
+document.getElementById("returnIngredient").value.trim();
+
+const qty =
+Number(document.getElementById("returnIngredientQty").value);
+
+if(!ingredient || !qty){
+
+alert("Fill all fields");
+
+return;
+
+}
+
+const issueQuery = query(
+collection(db,"ingredientIssues"),
+where("bakerId","==",bakerId),
+where("ingredient","==",ingredient)
+);
+
+const issueSnap = await getDocs(issueQuery);
+
+if(issueSnap.empty){
+
+alert("This baker was not issued this ingredient.");
+
+return;
+
+}
+
+const issueDoc = issueSnap.docs[0];
+const issueData = issueDoc.data();
+
+if(qty > (issueData.qty || 0)){
+
+alert("Returned quantity exceeds baker's remaining balance.");
+
+return;
+
+}
+
+const inventoryQuery = query(
+collection(db,"inventory"),
+where("ingredient","==",ingredient)
+);
+
+const inventorySnap = await getDocs(inventoryQuery);
+
+if(inventorySnap.empty){
+
+alert("Ingredient not found.");
+
+return;
+
+}
+
+const stockDoc = inventorySnap.docs[0];
+const stock = stockDoc.data();
+
+await updateDoc(
+doc(db,"inventory",stockDoc.id),
+{
+qty:(stock.qty || 0) + qty
+}
+);
+
+await updateDoc(
+doc(db,"ingredientIssues",issueDoc.id),
+{
+qty:(issueData.qty || 0) - qty
+}
+);
+
+await addDoc(
+collection(db,"inventoryHistory"),
+{
+ingredient,
+qty,
+unit: stock.unit || "",
+type:"Returned By Baker",
+baker: issueData.bakerName,
+receivedBy: window.currentUser.name,
+created: serverTimestamp()
+}
+);
+
+alert("Ingredients received successfully.");
+
+await loadIssueHistory();
+await loadBakerIssueBalances();
+
+document.getElementById("returnIngredient").value="";
+document.getElementById("returnIngredientQty").value="";
+
+await loadInventory();
+
+}
+
+window.loadIssueHistory = async function(){
+
+const div = document.getElementById("issueHistory");
+
+if(!div) return;
+
+const snap = await getDocs(collection(db,"ingredientIssues"));
+
+let html = "";
+
+snap.forEach(docSnap=>{
+
+const i = docSnap.data();
+
+html += `
+<div style="
+padding:8px;
+border-bottom:1px solid #ddd;
+">
+
+<b>${i.ingredient}</b><br>
+
+Qty: ${i.qty} ${i.unit || ""}<br>
+
+Issued To Baker: ${i.bakerName}<br>
+
+Issued By: ${i.issuedBy}
+
+</div>
+`;
+
+});
+
+if(html===""){
+
+html = "No ingredients issued.";
+
+}
+
+div.innerHTML = html;
+
+}
+window.loadBakerIssueBalances = async function(){
+
+const div =
+document.getElementById("bakerIssueBalances");
+
+if(!div) return;
+
+const snap =
+await getDocs(collection(db,"ingredientIssues"));
+
+let html = "";
+let grouped = {};
+
+snap.forEach(docSnap=>{
+
+const item = docSnap.data();
+
+if((item.qty || 0) <= 0) return;
+
+if(!grouped[item.bakerName]){
+grouped[item.bakerName] = [];
+}
+
+grouped[item.bakerName].push(item);
+
+});
+
+for(const baker in grouped){
+
+html += `
+<div style="
+padding:10px;
+margin-bottom:10px;
+border:1px solid #ddd;
+border-radius:6px;
+">
+
+<b>${baker}</b><br>
+`;
+
+grouped[baker].forEach(item=>{
+
+html += `
+${item.ingredient} :
+<b>${Number(item.qty || 0).toFixed(3).replace(/\.?0+$/, "")}</b> ${item.unit || ""}<br>
+`;
+
+});
+
+html += `</div>`;
+
+}
+
+if(html === ""){
+html = "No ingredients currently with bakers.";
+}
+
+div.innerHTML = html;
+
+}
+window.receiveSalesReturn = async function(){
+
+const raider =
+document.getElementById("raiderName").value.trim();
+
+const product =
+document.getElementById("dispatchProduct").value;
+
+const qty =
+Number(document.getElementById("dispatchQty").value);
+
+const reason =
+document.getElementById("dispatchReason").value.trim();
+const returnType =
+document.getElementById("dispatchReturnType").value;
+if(!raider || !qty){
+
+alert("Fill all fields");
+
+return;
+
+}
+const dispatchQuery = query(
+collection(db,"dispatches"),
+where("raider","==",raider),
+where("product","==",product)
+);
+
+const dispatchSnap = await getDocs(dispatchQuery);
+
+if(dispatchSnap.empty){
+
+alert("This raider was not issued this product.");
+
+return;
+
+}
+
+const dispatchDoc = dispatchSnap.docs[0];
+const dispatch = dispatchDoc.data();
+
+const available =
+(dispatch.qty || 0) - (dispatch.returned || 0);
+
+if(qty > available){
+
+alert("Return quantity exceeds products with the raider.");
+
+return;
+
+}
+await addDoc(
+collection(db,"salesReturns"),
+{
+raider,
+product,
+qty,
+reason,
+receivedBy:window.currentUser.name,
+created:serverTimestamp()
+}
+);
+await updateDoc(
+doc(db,"dispatches",dispatchDoc.id),
+{
+returned:(dispatch.returned || 0) + qty
+}
+);
+if(returnType === "good"){
+
+const finishedQuery = query(
+collection(db,"finishedStock"),
+where("product","==",product)
+);
+
+const finishedSnap = await getDocs(finishedQuery);
+
+if(finishedSnap.empty){
+
+await addDoc(
+collection(db,"finishedStock"),
+{
+product,
+qty,
+created:serverTimestamp()
+}
+);
+
+}else{
+
+const stockDoc = finishedSnap.docs[0];
+const stock = stockDoc.data();
+
+await updateDoc(
+doc(db,"finishedStock",stockDoc.id),
+{
+qty:(stock.qty || 0) + qty
+}
+);
+
+}
+
+}else{
+
+// Calculate the loss
+let loss = 0;
+
+const productionQuery = query(
+collection(db,"production"),
+where("item","==",product)
+);
+
+const productionSnap = await getDocs(productionQuery);
+
+let totalQty = 0;
+let totalCost = 0;
+
+productionSnap.forEach(docSnap=>{
+    const p = docSnap.data();
+    totalQty += Number(p.qty || 0);
+    totalCost += Number(p.productionCost || 0);
+});
+
+if(totalQty > 0){
+    loss = (totalCost / totalQty) * qty;
+}
+
+await addDoc(
+collection(db,"wastage"),
+{
+    product,
+    qty,
+    reason,
+    loss:Number(loss.toFixed(2)),
+    source:"Raider Return",
+    raider,
+    receivedBy:window.currentUser.name,
+    created:serverTimestamp()
+}
+);
+
+}
+
+alert("Sales Return Received");
+
+document.getElementById("raiderName").value="";
+document.getElementById("dispatchQty").value="";
+document.getElementById("dispatchReason").value="";
+
+await loadDispatchHistory();
+await loadFinishedStock();
+await loadRaiderStock();
+
+}
+window.loadDispatchHistory = async function(){
+
+const div =
+document.getElementById("dispatchHistory");
+
+if(!div) return;
+
+const snap =
+await getDocs(collection(db,"salesReturns"));
+
+let html = "";
+
+snap.forEach(docSnap=>{
+
+const r = docSnap.data();
+
+html += `
+<div style="
+padding:8px;
+border-bottom:1px solid #ddd;
+">
+
+<b>${r.product}</b><br>
+
+Qty: ${r.qty}<br>
+
+Raider: ${r.raider}<br>
+
+Return Type:
+<b style="color:${r.returnType==="good" ? "green" : "red"};">
+${r.returnType==="good" ? "Good Return" : "Damaged Return"}
+</b><br>
+
+Reason: ${r.reason || "-"}<br>
+
+Received By: ${r.receivedBy}
+
+</div>
+`;
+
+});
+
+if(html===""){
+
+html="No sales returns recorded.";
+
+}
+
+div.innerHTML=html;
+
+}
+window.loadMyIngredients = async function(){
+
+const div =
+document.getElementById("myIngredients");
+
+if(!div || !window.currentUser) return;
+
+const q = query(
+collection(db,"ingredientIssues"),
+where("bakerId","==",window.currentUser.id)
+);
+
+const snap = await getDocs(q);
+
+let totals = {};
+
+snap.forEach(docSnap=>{
+
+const item = docSnap.data();
+
+if(!totals[item.ingredient]){
+
+totals[item.ingredient] = {
+qty:0,
+unit:item.unit || ""
+};
+
+}
+
+totals[item.ingredient].qty += Number(item.qty || 0);
+
+});
+
+let html="";
+
+for(const ingredient in totals){
+
+html += `
+<div style="
+padding:8px;
+border-bottom:1px solid #ddd;
+">
+
+<b>${ingredient}</b>
+
+: ${Number(totals[ingredient].qty).toFixed(3).replace(/\.?0+$/, "")} ${totals[ingredient].unit}
+
+</div>
+`;
+
+}
+
+if(html===""){
+
+html="No ingredients issued.";
+
+}
+
+div.innerHTML=html;
+
+}
 window.saveProduction = async function(){
 
 const item =
@@ -753,91 +1741,89 @@ where("product","==",item)
 
 const packageSnap = await getDocs(packageQuery);
 
-if(!packageSnap.empty){
+if(packageSnap.empty){
 
-const packData =
-packageSnap.docs[0].data();
-
-actualPieces =
-qtyProduced * packData.pieces;
-
-}
-
-const flourUsed =
-Number(document.getElementById("flourUsed").value || 0);
-
-const sugarUsed =
-Number(document.getElementById("sugarUsed").value || 0);
-
-const oilUsed =
-Number(document.getElementById("oilUsed").value || 0);
-
-const yeastUsed =
-Number(document.getElementById("yeastUsed").value || 0);
-const ingredientsUsed = [
-{
-ingredient:"Flour",
-qty: flourUsed
-},
-{
-ingredient:"Sugar",
-qty: sugarUsed
-},
-{
-ingredient:"Oil",
-qty: oilUsed
-},
-{
-ingredient:"Yeast",
-qty: yeastUsed
-}
-];
-for(const itemUsed of ingredientsUsed){
-
-if(itemUsed.qty <= 0) continue;
-
-const inventoryQuery = query(
-collection(db,"inventory"),
-where("ingredient","==",itemUsed.ingredient)
-);
-
-const inventorySnap =
-await getDocs(inventoryQuery);
-
-if(inventorySnap.empty){
-
-alert(
-itemUsed.ingredient +
-" not found in inventory"
-);
+alert("Please set packaging for this product before recording production.");
 
 return;
 
 }
 
-const stockDoc =
-inventorySnap.docs[0];
+const packData =
+packageSnap.docs[0].data();
 
-const stock =
-stockDoc.data();
+actualPieces =
+qtyProduced * Number(packData.pieces || 0);
 
-if((stock.qty || 0) < itemUsed.qty){
-
-alert(
-"Not enough " +
-itemUsed.ingredient
+const recipeQuery = query(
+collection(db,"recipes"),
+where("product","==",item)
 );
+
+const recipeSnap = await getDocs(recipeQuery);
+
+if(recipeSnap.empty){
+
+alert("No recipe found for this product.");
+
+return;
+
+}
+
+let ingredientsUsed = [];
+
+recipeSnap.forEach(docSnap=>{
+
+const recipe = docSnap.data();
+
+const requiredQty =
+(recipe.qty / recipe.output) * qtyProduced;
+
+ingredientsUsed.push({
+ingredient:recipe.ingredient,
+qty:requiredQty
+});
+
+});
+for(const itemUsed of ingredientsUsed){
+
+if(itemUsed.qty <= 0) continue;
+
+const issueQuery = query(
+collection(db,"ingredientIssues"),
+where("bakerId","==",window.currentUser.id),
+where("ingredient","==",itemUsed.ingredient)
+);
+
+const issueSnap = await getDocs(issueQuery);
+
+if(issueSnap.empty){
+
+alert("You have not been issued " + itemUsed.ingredient);
+
+return;
+
+}
+
+const issueDoc = issueSnap.docs[0];
+
+const issueData = issueDoc.data();
+
+if((issueData.qty || 0) < itemUsed.qty){
+
+alert("Not enough issued " + itemUsed.ingredient);
 
 return;
 
 }
 
 await updateDoc(
-doc(db,"inventory",stockDoc.id),
+doc(db,"ingredientIssues",issueDoc.id),
 {
-qty:(stock.qty || 0) - itemUsed.qty
+qty:(issueData.qty || 0) - itemUsed.qty
 }
 );
+
 await addDoc(
 collection(db,"inventoryHistory"),
 {
@@ -847,6 +1833,7 @@ type:"Production Used",
 created:serverTimestamp()
 }
 );
+
 }
 
 let productionCost = 0;
@@ -854,45 +1841,50 @@ let productionCost = 0;
 const inventorySnap =
 await getDocs(collection(db,"inventory"));
 
+ingredientsUsed.forEach(itemUsed=>{
+
 inventorySnap.forEach(docSnap=>{
 
 const stock = docSnap.data();
 
-const ingredient =
-(stock.ingredient || "").toLowerCase();
-
-const cost =
-Number(stock.cost || 0);
-
-if(ingredient === "flour"){
+if(stock.ingredient === itemUsed.ingredient){
 
 productionCost +=
-flourUsed * cost;
-
-}
-
-if(ingredient === "sugar"){
-
-productionCost +=
-sugarUsed * cost;
-
-}
-
-if(ingredient === "oil"){
-
-productionCost +=
-oilUsed * cost;
-
-}
-
-if(ingredient === "yeast"){
-
-productionCost +=
-yeastUsed * cost;
+itemUsed.qty * Number(stock.cost || 0);
 
 }
 
 });
+
+});
+
+const priceQuery = query(
+collection(db,"sellingPrices"),
+where("product","==",item)
+);
+
+const priceSnap = await getDocs(priceQuery);
+
+let sellingPrice = 0;
+
+if(!priceSnap.empty){
+
+sellingPrice =
+Number(priceSnap.docs[0].data().price || 0);
+
+}
+if(sellingPrice <= 0){
+
+alert("Please set a selling price for this product before recording production.");
+
+return;
+
+}
+const salesValue =
+sellingPrice * qtyProduced;
+
+const profit =
+salesValue - productionCost;
 
 await addDoc(
 collection(db,"production"),
@@ -901,18 +1893,49 @@ bakerId: window.currentUser.id,
 bakerName: window.currentUser.name,
 item,
 qty: qtyProduced,
-flourUsed,
-sugarUsed,
-oilUsed,
-yeastUsed,
 productionCost,
+sellingPrice,
+salesValue,
+profit,
 created: serverTimestamp()
 }
 );
+const finishedQuery = query(
+collection(db,"finishedStock"),
+where("product","==",item)
+);
 
+const finishedSnap = await getDocs(finishedQuery);
+
+if(finishedSnap.empty){
+
+await addDoc(
+collection(db,"finishedStock"),
+{
+product:item,
+qty:qtyProduced,
+created:serverTimestamp()
+}
+);
+
+}else{
+
+const stockDoc = finishedSnap.docs[0];
+const stock = stockDoc.data();
+
+await updateDoc(
+doc(db,"finishedStock",stockDoc.id),
+{
+qty:(stock.qty || 0) + qtyProduced
+}
+);
+
+}
 alert("Production Saved And Inventory Updated");
 
 await loadMyProduction();
+await loadMyIngredients();
+await loadBakerIssueBalances();
 await loadInventory();
 await loadLowStock();
 await loadInventoryHistory();
@@ -945,14 +1968,28 @@ const p=docSnap.data();
 
 total += Number(p.qty||0);
 
+let time = "";
+
+if (p.created) {
+    time = p.created.toDate().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
 html += `
 <div style="
 border-bottom:1px solid #ddd;
 padding:8px;
 ">
-${p.item} - ${p.qty}
+<div style="color:green;font-weight:bold;">
+✓ ${p.item}
+</div>
+
+Produced: ${p.qty} Packets
 <br>
-Cost: Ksh ${p.productionCost || 0}
+
+Recorded at: ${time}
 </div>
 `;
 
@@ -969,8 +2006,14 @@ div.innerHTML = html;
 
 window.saveInventory = async function(){
 
-const ingredient =
+let ingredient =
 document.getElementById("ingredientName").value.trim();
+
+ingredient =
+ingredient.toLowerCase()
+.split(" ")
+.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+.join(" ");
 
 const qty =
 Number(document.getElementById("ingredientQty").value);
@@ -981,9 +2024,25 @@ Number(document.getElementById("ingredientCost").value);
 const unit =
 document.getElementById("ingredientUnit").value;
 
-if(!ingredient || !qty){
+if(!ingredient){
 
-alert("Fill all inventory fields");
+alert("Enter ingredient name");
+
+return;
+
+}
+
+if(qty <= 0){
+
+alert("Quantity must be greater than zero.");
+
+return;
+
+}
+
+if(cost < 0){
+
+alert("Cost cannot be negative.");
 
 return;
 
@@ -1015,11 +2074,19 @@ const stockDoc = snap.docs[0];
 
 const stock = stockDoc.data();
 
+const oldQty = Number(stock.qty || 0);
+const oldCost = Number(stock.cost || 0);
+
+const newQty = oldQty + qty;
+
+const averageCost =
+((oldQty * oldCost) + (qty * cost)) / newQty;
+
 await updateDoc(
 doc(db,"inventory",stockDoc.id),
 {
-qty:(stock.qty || 0) + qty,
-cost,
+qty: newQty,
+cost: Number(averageCost.toFixed(2)),
 unit
 }
 );
@@ -1034,7 +2101,8 @@ qty,
 cost,
 unit,
 type:"Stock Added",
-created:serverTimestamp()
+receivedBy: window.currentUser.name,
+created: serverTimestamp()
 }
 );
 
@@ -1054,12 +2122,13 @@ window.loadInventory = async function(){
 const div =
 document.getElementById("inventoryList");
 
-if(!div) return;
+const storeDiv =
+document.getElementById("storeInventoryList");
 
 const snap =
 await getDocs(collection(db,"inventory"));
 
-let html="";
+let html = "";
 
 snap.forEach(docSnap=>{
 
@@ -1083,9 +2152,15 @@ Cost: Ksh ${i.cost} per ${i.unit || "unit"}<br><br>
 '${i.id}',
 '${i.ingredient}',
 ${i.qty},
-${i.cost}
+${i.cost},
+'${i.unit || ""}'
 )">
 Edit
+</button>
+
+<button onclick="deleteInventory('${i.id}')"
+style="margin-left:10px;background:#d9534f;">
+Delete
 </button>
 
 </div>
@@ -1093,7 +2168,14 @@ Edit
 
 });
 
+if(div){
 div.innerHTML = html;
+}
+
+if(storeDiv){
+storeDiv.innerHTML = html;
+}
+
 let summary = "";
 
 snap.forEach(docSnap=>{
@@ -1120,8 +2202,63 @@ if(stockDiv){
 stockDiv.innerHTML = summary;
 
 }
-};
 
+};
+window.loadRecipeIngredients = async function(){
+
+const recipeSelect =
+document.getElementById("recipeIngredient");
+
+const issueSelect =
+document.getElementById("issueIngredient");
+
+const returnSelect =
+document.getElementById("returnIngredient");
+
+const snap =
+await getDocs(collection(db,"inventory"));
+
+if(recipeSelect) recipeSelect.innerHTML = "";
+if(issueSelect) issueSelect.innerHTML = "";
+if(returnSelect) returnSelect.innerHTML = "";
+
+snap.forEach(docSnap=>{
+
+const item = docSnap.data();
+
+if(recipeSelect){
+
+recipeSelect.innerHTML += `
+<option value="${item.ingredient}">
+${item.ingredient} (${item.unit || ""})
+</option>
+`;
+
+}
+
+if(issueSelect){
+
+issueSelect.innerHTML += `
+<option value="${item.ingredient}">
+${item.ingredient}
+</option>
+`;
+
+}
+
+if(returnSelect){
+
+returnSelect.innerHTML += `
+<option value="${item.ingredient}">
+${item.ingredient}
+</option>
+`;
+
+}
+
+});
+
+}
 window.saveRecipe = async function(){
 
 const product =
@@ -1146,6 +2283,16 @@ Number(
 document.getElementById("recipeOutput").value
 );
 
+const recipeQuery = query(
+collection(db,"recipes"),
+where("product","==",product),
+where("ingredient","==",ingredient)
+);
+
+const recipeSnap = await getDocs(recipeQuery);
+
+if(recipeSnap.empty){
+
 await addDoc(
 collection(db,"recipes"),
 {
@@ -1156,6 +2303,18 @@ output,
 created:serverTimestamp()
 }
 );
+
+}else{
+
+await updateDoc(
+doc(db,"recipes",recipeSnap.docs[0].id),
+{
+qty,
+output
+}
+);
+
+}
 
 document.getElementById("recipeIngredient").value="";
 document.getElementById("recipeQty").value="";
@@ -1190,10 +2349,24 @@ border-bottom:1px solid #ddd;
 <b>${r.product}</b><br>
 Output: ${r.output} Packets<br>
 ${r.ingredient} : ${r.qty}
+<br><br>
+
+<button onclick="editRecipe('${docSnap.id}',${r.qty},${r.output})">
+Edit
+</button>
+
+<button onclick="deleteRecipe('${docSnap.id}')">
+Delete
+</button>
+
 </div>
 `;
 
 });
+
+if(html===""){
+html="No recipes saved.";
+}
 
 div.innerHTML = html;
 
@@ -1248,10 +2421,12 @@ document.getElementById("inventoryHistory");
 
 if(!div) return;
 
-const snap =
-await getDocs(
-collection(db,"inventoryHistory")
+const q = query(
+collection(db,"inventoryHistory"),
+orderBy("created","desc")
 );
+
+const snap = await getDocs(q);
 
 let html = "";
 
@@ -1273,11 +2448,24 @@ border-bottom:1px solid #ddd;
 ${date}
 </small><br>
 
-<b>${h.ingredient}</b>
+<b>${h.ingredient}</b><br>
 
-+${h.qty}
+Qty: ${h.qty} ${h.unit || ""}<br>
 
-(${h.type})
+Type: ${h.type}<br>
+${h.oldQty !== undefined ?
+"Old Qty: " + h.oldQty + "<br>New Qty: " + h.newQty + "<br>" : ""}
+
+${h.oldCost !== undefined ?
+"Old Cost: KSh " + h.oldCost + "<br>New Cost: KSh " + h.newCost + "<br>" : ""}
+
+${h.editedBy ?
+"Edited By: " + h.editedBy + "<br>" : ""}
+${h.oldOutput !== undefined ?
+"Old Output: " + h.oldOutput + "<br>New Output: " + h.newOutput + "<br>" : ""}
+${h.receivedBy ? "Received By: " + h.receivedBy + "<br>" : ""}
+
+${h.cost ? "Cost: KSh " + h.cost + "<br>" : ""}
 
 </div>
 `;
@@ -1287,12 +2475,78 @@ ${date}
 div.innerHTML = html;
 
 }
+window.resetAllData = async function(){
+
+if(!confirm("This will delete ALL bakery data. Continue?")) return;
+
+const pin = prompt("Enter Admin PIN");
+
+if(pin === null) return;
+
+const adminDoc = await getDoc(
+doc(db,"adminSettings","admin")
+);
+
+if(!adminDoc.exists()){
+
+alert("Admin password not set.");
+
+return;
+
+}
+
+if(pin !== adminDoc.data().password){
+
+alert("Wrong Admin PIN");
+
+return;
+
+}
+
+const collections = [
+"users",
+"inventory",
+"inventoryHistory",
+"ingredientIssues",
+"production",
+"finishedStock",
+"returns",
+"salesReturns",
+"wastage",
+"dispatches",
+"recipes",
+"sellingPrices",
+"packaging",
+"dayClosures"
+];
+
+for(const name of collections){
+
+const snap = await getDocs(collection(db,name));
+
+for(const d of snap.docs){
+
+await deleteDoc(doc(db,name,d.id));
+
+}
+
+}
+
+alert("All bakery data has been reset successfully.");
+
+location.reload();
+
+}
 window.resetProduction = async function(){
 
 if(!confirm("Delete ALL production records?")) return;
 
-const snap =
-await getDocs(collection(db,"production"));
+const q = query(
+collection(db,"production"),
+orderBy("created","desc")
+);
+
+const snap = await getDocs(q);
 
 for(const docSnap of snap.docs){
 
@@ -1401,14 +2655,34 @@ return;
 
 }
 
+const q = query(
+collection(db,"packaging"),
+where("product","==",product)
+);
+
+const snap = await getDocs(q);
+
+if(snap.empty){
+
 await addDoc(
 collection(db,"packaging"),
 {
 product,
 pieces,
-created: serverTimestamp()
+created:serverTimestamp()
 }
 );
+
+}else{
+
+await updateDoc(
+doc(db,"packaging",snap.docs[0].id),
+{
+pieces
+}
+);
+
+}
 
 alert("Packaging Saved");
 
@@ -1516,6 +2790,15 @@ Number(document.getElementById("wasteQty").value);
 
 const reason =
 document.getElementById("wasteReason").value;
+
+if(!qty){
+
+alert("Enter quantity");
+
+return;
+
+}
+
 const productionQuery = query(
 collection(db,"production"),
 where("item","==",product)
@@ -1553,22 +2836,37 @@ Number(w.qty || 0);
 
 if((totalWasted + qty) > totalProduced){
 
-alert(
-"Cannot waste more than produced."
+alert("Cannot waste more than produced.");
+
+return;
+
+}
+
+const finishedQuery = query(
+collection(db,"finishedStock"),
+where("product","==",product)
 );
 
+const finishedSnap = await getDocs(finishedQuery);
+
+if(finishedSnap.empty){
+
+alert("No finished stock available.");
+
 return;
 
 }
-if(!qty){
 
-alert("Enter quantity");
+const stockDoc = finishedSnap.docs[0];
+const stock = stockDoc.data();
+
+if((stock.qty || 0) < qty){
+
+alert("Not enough finished stock.");
 
 return;
 
 }
-
-
 
 let totalQty = 0;
 
@@ -1592,6 +2890,13 @@ totalQty > 0
 
 : 0;
 
+await updateDoc(
+doc(db,"finishedStock",stockDoc.id),
+{
+qty:(stock.qty || 0) - qty
+}
+);
+
 await addDoc(
 collection(db,"wastage"),
 {
@@ -1599,7 +2904,7 @@ product,
 qty,
 reason,
 loss,
-created: serverTimestamp()
+created:serverTimestamp()
 }
 );
 
@@ -1608,46 +2913,10 @@ alert("Wastage Saved");
 document.getElementById("wasteQty").value="";
 document.getElementById("wasteReason").value="";
 
-loadWastage();
-loadInventory();
-loadLowStock();
-
-}
-window.saveReturn = async function(){
-
-const product =
-document.getElementById("returnProduct").value;
-
-const qty =
-Number(document.getElementById("returnQty").value);
-
-const reason =
-document.getElementById("returnReason").value;
-
-if(!qty){
-
-alert("Enter quantity");
-
-return;
-
-}
-
-await addDoc(
-collection(db,"returns"),
-{
-product,
-qty,
-reason,
-created: serverTimestamp()
-}
-);
-
-alert("Return Saved");
-
-document.getElementById("returnQty").value="";
-document.getElementById("returnReason").value="";
-
-loadReturns();
+await loadWastage();
+await loadFinishedStock();
+await loadInventory();
+await loadLowStock();
 
 }
 window.loadWastage = async function(){
@@ -1701,37 +2970,188 @@ window.editInventory = async function(
 id,
 ingredient,
 qty,
-cost
+cost,
+unit
 ){
 
+const newIngredient =
+prompt("Enter Ingredient Name", ingredient);
+
+if(newIngredient === null) return;
+
 const newQty =
-prompt(
-"Enter New Quantity",
-qty
-);
+prompt("Enter New Quantity", qty);
 
 if(newQty === null) return;
 
 const newCost =
-prompt(
-"Enter New Cost",
-cost
-);
+prompt("Enter New Cost", cost);
 
 if(newCost === null) return;
+
+const newUnit =
+prompt("Enter Unit", unit || "kg");
+
+if(newUnit === null) return;
+
+if(Number(newQty) < 0){
+
+alert("Quantity cannot be negative");
+
+return;
+
+}
+
+if(Number(newCost) < 0){
+
+alert("Cost cannot be negative");
+
+return;
+
+}
+
+await addDoc(
+collection(db,"inventoryHistory"),
+{
+ingredient:ingredient,
+type:"Inventory Edited",
+
+oldQty:qty,
+newQty:Number(newQty),
+
+oldCost:cost,
+newCost:Number(newCost),
+
+oldUnit:unit,
+newUnit:newUnit.trim(),
+
+editedBy:currentUser.name,
+created:serverTimestamp()
+}
+);
 
 await updateDoc(
 doc(db,"inventory",id),
 {
+ingredient:newIngredient.trim(),
 qty:Number(newQty),
-cost:Number(newCost)
+cost:Number(newCost),
+unit:newUnit.trim()
 }
 );
-
 alert("Inventory Updated");
 
-loadInventory();
-loadLowStock();
+await loadInventory();
+await loadLowStock();
+await loadRecipeIngredients();
+
+}
+window.deleteInventory = async function(id){
+
+const ok = confirm(
+"Are you sure you want to delete this inventory item?"
+);
+
+if(!ok) return;
+
+await deleteDoc(
+doc(db,"inventory",id)
+);
+
+alert("Inventory deleted successfully.");
+
+await loadInventory();
+await loadLowStock();
+await loadRecipeIngredients();
+
+}
+window.deleteInventory = async function(id){
+
+const ok = confirm(
+"Are you sure you want to delete this inventory item?"
+);
+
+if(!ok) return;
+const inventoryDoc = await getDoc(
+doc(db,"inventory",id)
+);
+
+const ingredient =
+inventoryDoc.data().ingredient;
+
+const recipeSnap =
+await getDocs(collection(db,"recipes"));
+
+let usedInRecipe = false;
+
+recipeSnap.forEach(docSnap=>{
+
+const recipe = docSnap.data();
+
+if(recipe.ingredient === ingredient){
+
+usedInRecipe = true;
+
+}
+
+});
+
+if(usedInRecipe){
+
+alert(
+"Cannot delete. This ingredient is used in one or more recipes."
+);
+
+return;
+
+}
+const issueSnap =
+await getDocs(collection(db,"ingredientIssues"));
+
+let issuedToBaker = false;
+
+issueSnap.forEach(docSnap=>{
+
+const issue = docSnap.data();
+
+if(
+issue.ingredient === ingredient &&
+(issue.qty || 0) > 0
+){
+
+issuedToBaker = true;
+
+}
+
+});
+
+if(issuedToBaker){
+
+alert(
+"Cannot delete. This ingredient is currently issued to a baker."
+);
+
+return;
+
+}
+const stock = inventoryDoc.data();
+
+if((stock.qty || 0) > 0){
+
+alert(
+"Cannot delete. Reduce the inventory quantity to zero before deleting this ingredient."
+);
+
+return;
+
+}
+await deleteDoc(
+doc(db,"inventory",id)
+);
+
+alert("Inventory deleted successfully.");
+
+await loadInventory();
 
 }
 window.loadReturns = async function(){
@@ -2046,6 +3466,56 @@ text.includes(search)
 });
 
 }
+window.editRecipe = async function(id,qty,output){
+
+const newQty=prompt("Enter New Quantity",qty);
+if(newQty===null) return;
+
+const newOutput=prompt("Enter New Output",output);
+if(newOutput===null) return;
+
+await addDoc(
+collection(db,"inventoryHistory"),
+{
+type:"Recipe Edited",
+
+oldQty:qty,
+newQty:Number(newQty),
+
+oldOutput:output,
+newOutput:Number(newOutput),
+
+editedBy:currentUser.name,
+created:serverTimestamp()
+}
+);
+
+await updateDoc(
+doc(db,"recipes",id),
+{
+qty:Number(newQty),
+output:Number(newOutput)
+}
+);
+
+alert("Recipe Updated");
+
+loadRecipes();
+
+}
+
+window.deleteRecipe = async function(id){
+
+if(!confirm("Delete this recipe?")) return;
+
+await deleteDoc(
+doc(db,"recipes",id));
+
+alert("Recipe Deleted");
+
+loadRecipes();
+
+}
 window.loadSellingPrices = async function(){
 
 const div =
@@ -2080,6 +3550,287 @@ html = "No prices saved.";
 div.innerHTML = html;
 
 }
+window.loadFinishedStock = async function(){
+
+const div = document.getElementById("finishedStockList");
+
+if(!div) return;
+
+const snap = await getDocs(collection(db,"finishedStock"));
+
+let html = "";
+
+snap.forEach(docSnap=>{
+
+const item = docSnap.data();
+
+html += `
+<div style="padding:8px;border-bottom:1px solid #ddd;">
+<b>${item.product}</b><br>
+Available: ${item.qty}
+</div>
+`;
+
+});
+
+if(html===""){
+html = "No finished products available.";
+}
+
+div.innerHTML = html;
+
+}
+window.issueToRaider = async function(){
+
+const raider =
+document.getElementById("raiderIssueName").value.trim();
+
+const product =
+document.getElementById("issueProduct").value;
+
+const qty =
+Number(document.getElementById("issueProductQty").value);
+
+if(!raider || !qty){
+alert("Fill all fields");
+return;
+}
+const q = query(
+collection(db,"finishedStock"),
+where("product","==",product)
+);
+
+const snap = await getDocs(q);
+
+if(snap.empty){
+alert("No finished stock available.");
+return;
+}
+
+const stockDoc = snap.docs[0];
+const stock = stockDoc.data();
+
+if((stock.qty || 0) < qty){
+alert("Insufficient finished stock.");
+return;
+}
+await updateDoc(
+doc(db,"finishedStock",stockDoc.id),
+{
+qty:(stock.qty || 0) - qty
+}
+);
+
+await addDoc(
+collection(db,"dispatches"),
+{
+raider,
+product,
+qty,
+returned:0,
+dispatcher:currentUser.name,
+created:serverTimestamp()
+}
+);
+alert("Products issued successfully.");
+
+document.getElementById("raiderIssueName").value = "";
+document.getElementById("issueProductQty").value = "";
+
+await loadFinishedStock();
+await loadRaiderStock();
+
+}
+window.loadRaiderStock = async function(){
+
+const div = document.getElementById("raiderStock");
+
+if(!div) return;
+
+const snap = await getDocs(collection(db,"dispatches"));
+
+let html = "";
+
+snap.forEach(docSnap=>{
+
+const d = docSnap.data();
+
+const balance = (d.qty || 0) - (d.returned || 0);
+
+if(balance > 0){
+
+html += `
+<div style="padding:10px;border-bottom:1px solid #ddd;background:#fafafa;margin-bottom:6px;border-radius:6px;">
+<b style="font-size:16px;">👤 ${d.raider}</b><br>
+
+<b>Product:</b> ${d.product}<br>
+
+<b>Issued:</b> ${d.qty} Packets<br>
+
+<b>Returned:</b> ${d.returned || 0} Packets<br>
+
+<b style="color:#C57C2D;">Currently With Raider:</b>
+${balance} Packets
+</div>
+`;
+
+}
+
+});
+
+if(html===""){
+html = "No products currently with raiders.";
+}
+
+div.innerHTML = html;
+
+}
+window.closeDayShift = async function(){
+
+const snap = await getDocs(collection(db,"dispatches"));
+
+let report = {};
+let totalIssued = 0;
+let totalReturned = 0;
+let totalSold = 0;
+
+snap.forEach(docSnap=>{
+
+const d = docSnap.data();
+
+const product = d.product;
+const issued = Number(d.qty || 0);
+const returned = Number(d.returned || 0);
+const sold = issued - returned;
+
+if(!report[product]){
+report[product]={
+issued:0,
+returned:0,
+sold:0
+};
+}
+
+report[product].issued += issued;
+report[product].returned += returned;
+report[product].sold += sold;
+
+totalIssued += issued;
+totalReturned += returned;
+totalSold += sold;
+
+});
+
+const today = new Date().toISOString().split("T")[0];
+
+const existing = query(
+collection(db,"dayClosures"),
+where("day","==",today)
+);
+
+const existingSnap = await getDocs(existing);
+
+if(!existingSnap.empty){
+
+alert("Today's shift has already been closed.");
+
+return;
+
+}
+
+await addDoc(
+collection(db,"dayClosures"),
+{
+day:today,
+report,
+issued:totalIssued,
+returned:totalReturned,
+sold:totalSold,
+closedBy:currentUser.name,
+created:serverTimestamp()
+}
+);
+
+let html = "<b>DAY CLOSED SUCCESSFULLY</b><br><br>";
+
+for(const product in report){
+
+html += `
+<b>${product}</b><br>
+Issued: ${report[product].issued}<br>
+Returned: ${report[product].returned}<br>
+Sold: ${report[product].sold}<br><br>
+`;
+
+}
+
+html += `
+<hr>
+<b>Total Issued:</b> ${totalIssued}<br>
+<b>Total Returned:</b> ${totalReturned}<br>
+<b>Total Sold:</b> ${totalSold}<br>
+<b>Closed By:</b> ${currentUser.name}
+`;
+
+document.getElementById("closeSummary").innerHTML = html;
+
+document.querySelector(
+'button[onclick="closeDayShift()"]'
+).disabled = true;
+
+alert("Day Shift Closed Successfully.");
+await loadDayClosures();
+}
+window.loadDayClosures = async function(){
+
+const div = document.getElementById("dayClosureHistory");
+
+if(!div) return;
+
+const q = query(
+collection(db,"dayClosures"),
+orderBy("created","desc")
+);
+
+const snap = await getDocs(q);
+
+let html = "";
+
+snap.forEach(docSnap=>{
+
+const d = docSnap.data();
+
+html += `
+<div style="
+padding:10px;
+border-bottom:1px solid #ddd;
+">
+
+<b>${d.day}</b><br>
+
+Closed By: ${d.closedBy}<br>
+
+Issued: ${d.issued}<br>
+
+Returned: ${d.returned}<br>
+
+Sold: ${d.sold}
+
+</div>
+`;
+
+});
+
+if(html===""){
+
+html = "No day closures yet.";
+
+}
+
+div.innerHTML = html;
+
+}
+
 window.onload = function(){
 
 console.log("Waziri Production Loaded");
